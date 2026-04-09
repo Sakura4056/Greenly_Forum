@@ -1,0 +1,217 @@
+/**
+ * 响应式设计全局样式
+ * 断点定义：
+ * - xs: < 576px (手机)
+ * - sm: >= 576px (小屏手机)
+ * - md: >= 768px (平板)
+ * - lg: >= 992px (桌面)
+ * - xl: >= 1200px (大屏桌面)
+ */
+
+// Mixins for responsive design
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == xs {
+    @media (max-width: 575.98px) { @content; }
+  } @else if $breakpoint == sm {
+    @media (min-width: 576px) and (max-width: 767.98px) { @content; }
+  } @else if $breakpoint == md {
+    @media (min-width: 768px) and (max-width: 991.98px) { @content; }
+  } @else if $breakpoint == lg {
+    @media (min-width: 992px) and (max-width: 1199.98px) { @content; }
+  } @else if $breakpoint == xl {
+    @media (min-width: 1200px) { @content; }
+  } @else if $breakpoint == mobile {
+    @media (max-width: 767.98px) { @content; }
+  } @else if $breakpoint == tablet {
+    @media (min-width: 768px) and (max-width: 991.98px) { @content; }
+  } @else if $breakpoint == desktop {
+    @media (min-width: 992px) { @content; }
+  }
+}
+
+// Common responsive utilities
+.responsive-container {
+  width: 100%;
+  padding: 0 16px;
+
+  @include respond-to(md) {
+    padding: 0 24px;
+  }
+
+  @include respond-to(lg) {
+    padding: 0 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+
+.responsive-card {
+  border-radius: 12px;
+
+  @include respond-to(mobile) {
+    border-radius: 8px;
+    margin: 0 -16px;
+  }
+}
+
+.responsive-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+
+  @include respond-to(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond-to(lg) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  @include respond-to(xl) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.responsive-table {
+  @include respond-to(mobile) {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    table {
+      min-width: 600px;
+    }
+  }
+}
+
+.responsive-form {
+  .el-form-item {
+    @include respond-to(mobile) {
+      margin-bottom: 16px;
+
+      .el-form-item__label {
+        font-size: 14px;
+      }
+
+      .el-form-item__content {
+        .el-input,
+        .el-select,
+        .el-date-editor {
+          width: 100% !important;
+        }
+      }
+    }
+  }
+}
+
+.responsive-dialog {
+  @include respond-to(mobile) {
+    :deep(.el-dialog) {
+      width: 95% !important;
+      margin-top: 5vh !important;
+      border-radius: 12px;
+    }
+
+    :deep(.el-dialog__body) {
+      padding: 16px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    :deep(.el-dialog__header) {
+      padding: 16px;
+    }
+
+    :deep(.el-dialog__footer) {
+      padding: 12px 16px;
+    }
+  }
+}
+
+.responsive-button-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  @include respond-to(mobile) {
+    flex-direction: column;
+    width: 100%;
+
+    .el-button {
+      width: 100%;
+    }
+  }
+}
+
+.responsive-header {
+  @include respond-to(mobile) {
+    h2 {
+      font-size: 18px !important;
+    }
+
+    .header-actions {
+      .el-button {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+    }
+  }
+}
+
+.responsive-tabs {
+  @include respond-to(mobile) {
+    :deep(.el-tabs__nav) {
+      display: flex;
+      width: 100%;
+
+      .el-tabs__item {
+        flex: 1;
+        padding: 0 12px;
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+.responsive-chart {
+  width: 100%;
+  height: 300px;
+
+  @include respond-to(mobile) {
+    height: 250px;
+  }
+
+  @include respond-to(lg) {
+    height: 350px;
+  }
+}
+
+// Touch-friendly improvements for mobile
+@include respond-to(mobile) {
+  // Increase tap target size
+  .el-button {
+    min-height: 40px;
+    padding: 10px 16px;
+  }
+
+  .el-input__inner {
+    min-height: 40px;
+  }
+
+  .el-select {
+    .el-input__inner {
+      min-height: 40px;
+    }
+  }
+
+  // Improve scrolling
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  // Better touch feedback
+  .el-button:active {
+    opacity: 0.7;
+  }
+}

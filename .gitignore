@@ -1,0 +1,111 @@
+# ==================== IDE 配置 ====================
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+# 保留推荐的扩展列表
+!.vscode/extensions.json
+
+# Lingma AI Assistant
+.lingma/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# NetBeans
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# ==================== 构建产物 ====================
+# Maven (后端)
+plant-backend/target/
+plant-backend/*.log
+plant-backend/pom.xml.tag
+plant-backend/pom.xml.releaseBackup
+plant-backend/pom.xml.versionsBackup
+
+# Vite / Node.js (前端)
+plant-frontend/dist/
+plant-frontend/dist-ssr/
+plant-frontend/.vite/
+plant-frontend/node_modules/
+# package-lock.json 可选：如果团队需要统一依赖版本则保留
+# plant-frontend/package-lock.json
+
+# ==================== 上传文件和用户数据 ====================
+# 用户上传的图片文件（不应提交到版本控制）
+data/uploads/
+# 保留目录结构（如果需要）
+!data/uploads/.gitkeep
+
+# ==================== 日志文件 ====================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ==================== 环境变量和敏感信息 ====================
+.env
+.env.local
+.env.*.local
+plant-backend/.env
+*.pem
+*.key
+*.keystore
+credentials.json
+service-account.json
+
+# ==================== 操作系统文件 ====================
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ==================== 临时文件 ====================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+*.bak
+.cache/
+
+# ==================== 测试覆盖率报告 ====================
+coverage/
+.nyc_output/
+jacoco/
+
+# ==================== Python (如果有脚本) ====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+
+# ==================== Gradle (如果使用) ====================
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ==================== 其他 ====================
+# 临时测试文件
+plant-frontend/hash.txt
+
+# Apifox 缓存
+**/.apifox-helper/

@@ -1,0 +1,97 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: plant-backend
+
+  # MySQL 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    url: ${DB_URL}
+
+
+  # 文件上传限制
+  servlet:
+    multipart:
+      max-file-size: 10MB # 单个文件最大 10MB
+      max-request-size: 50MB # 请求最大 50MB
+
+  # 邮件配置
+  mail:
+    host: ${MAIL_HOST:smtp.163.com}
+    port: ${MAIL_PORT:465}
+    protocol: smtp
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+            required: true
+          socketFactory:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
+
+  # Redis 配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:  # Redis 密码（如果有）
+      database: 0
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+          max-wait: 3000ms
+
+# MyBatis Plus 配置 (全局)
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# JWT 配置
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000
+  header: Authorization
+
+# 日志
+logging:
+  level:
+    com.plant.backend: DEBUG
+    org.springframework: INFO
+    com.zaxxer.hikari: INFO
+  charset:
+    console: UTF-8
+    file: UTF-8
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
+
+# 应用特定配置
+app:
+  file-upload-path: ./data/uploads/
+  mail:
+    # 发件人显示名称（SMTP 服务器允许的情况下，邮件客户端将显示此名称而非个人昵称）
+    from-display-name: Greenly Support
+
+# 百度AI配置
+baidu:
+  ai:
+    app-id: ${BAIDU_AI_APP_ID}
+    api-key: ${BAIDU_AI_API_KEY}
+    secret-key: ${BAIDU_AI_SECRET_KEY}
+    plant-detect-enabled: true

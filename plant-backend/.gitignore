@@ -1,0 +1,56 @@
+# ==================== Maven 构建产物 ====================
+target/
+*.jar
+*.war
+*.ear
+*.class
+
+# ==================== IDE 配置 ====================
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.vscode/
+
+# ==================== 日志文件 ====================
+*.log
+logs/
+
+# ==================== Maven 临时文件 ====================
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+.depend
+build.log
+
+# ==================== Eclipse ====================
+bin/
+tmp/
+
+# ==================== NetBeans ====================
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# ==================== IntelliJ ====================
+out/
+!**/.gitkeep
+
+# ==================== 依赖分析 ====================
+dependency-reduced-pom.xml
+
+# ==================== 覆盖率报告 ====================
+jacoco/
+coverage/
+
+# ==================== Spring Boot ====================
+*.pid
+spring-boot-devtools.properties
+
+# ==================== 操作系统文件 ====================
+.DS_Store
+Thumbs.db
