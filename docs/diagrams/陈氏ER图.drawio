@@ -1,0 +1,226 @@
+<mxfile host="app.diagrams.net" modified="2026-04-09T01:48:00.000Z" agent="draw.io" version="24.0.0" type="device">
+  <diagram id="chen-er" name="陈氏ER图">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- 标题 -->
+        <mxCell id="title" value="&lt;font style=&quot;font-size:20px;&quot;&gt;&lt;b&gt;Greenly 植物养护管理系统 — 陈氏 E-R 图&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="550" y="10" width="500" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- ====== 实体（矩形） ====== -->
+
+        <!-- 用户实体 -->
+        <mxCell id="e_user" value="&lt;b&gt;用户&lt;/b&gt;&lt;br&gt;User" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="70" width="140" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 官方植物实体 -->
+        <mxCell id="e_official" value="&lt;b&gt;官方植物&lt;/b&gt;&lt;br&gt;OfficialPlant" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="220" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 我的植物实体 -->
+        <mxCell id="e_myplant" value="&lt;b&gt;我的植物&lt;/b&gt;&lt;br&gt;MyPlant" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="220" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 养护计划实体 -->
+        <mxCell id="e_schedule" value="&lt;b&gt;养护计划&lt;/b&gt;&lt;br&gt;CareSchedule" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="850" y="220" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 养护记录实体 -->
+        <mxCell id="e_record" value="&lt;b&gt;养护记录&lt;/b&gt;&lt;br&gt;CareRecord" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="220" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 植物日记实体 -->
+        <mxCell id="e_diary" value="&lt;b&gt;植物日记&lt;/b&gt;&lt;br&gt;PlantDiary" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="420" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 植物照片实体 -->
+        <mxCell id="e_photo" value="&lt;b&gt;植物照片&lt;/b&gt;&lt;br&gt;PlantPhoto" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="420" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 提醒配置实体 -->
+        <mxCell id="e_reminder_config" value="&lt;b&gt;提醒配置&lt;/b&gt;&lt;br&gt;ReminderConfig" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="850" y="420" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 消息提醒实体 -->
+        <mxCell id="e_reminder" value="&lt;b&gt;消息提醒&lt;/b&gt;&lt;br&gt;Reminder" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="420" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 论坛帖子实体 -->
+        <mxCell id="e_post" value="&lt;b&gt;论坛帖子&lt;/b&gt;&lt;br&gt;ForumPost" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="620" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 论坛评论实体 -->
+        <mxCell id="e_comment" value="&lt;b&gt;论坛评论&lt;/b&gt;&lt;br&gt;ForumComment" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="620" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 论坛点赞实体 -->
+        <mxCell id="e_like" value="&lt;b&gt;论坛点赞&lt;/b&gt;&lt;br&gt;ForumLike" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="850" y="620" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 论坛分类实体 -->
+        <mxCell id="e_category" value="&lt;b&gt;论坛分类&lt;/b&gt;&lt;br&gt;ForumCategory" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="620" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- 系统公告实体 -->
+        <mxCell id="e_announce" value="&lt;b&gt;系统公告&lt;/b&gt;&lt;br&gt;Announcement" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="800" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- AI对话记录实体 -->
+        <mxCell id="e_ai" value="&lt;b&gt;AI对话记录&lt;/b&gt;&lt;br&gt;AiConversation" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="850" y="800" width="160" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ====== 关系（菱形） ====== -->
+
+        <!-- 用户 - 拥有 - 我的植物 -->
+        <mxCell id="r1" value="&lt;b&gt;拥有&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="610" y="175" width="80" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- 我的植物 - 关联 - 官方植物 -->
+        <mxCell id="r2" value="&lt;b&gt;关联&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="280" width="80" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- 用户 - 制定 - 养护计划 -->
+        <mxCell id="r3" value="&lt;b&gt;制定&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="790" y="175" width="80" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- 养护计划 - 生成 - 养护记录 -->
+        <mxCell id="r4" value="&lt;b&gt;生成&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="280" width="80" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- 我的植物 - 产生 - 养护计划 -->
+        <mxCell id="r5" value="&lt;b&gt;产生&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="280" width="80" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- 我的植物 - 撰写 - 植物日记 -->
+        <mxCell id="r6" value="&lt;b&gt;撰写&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="380" y="360" width="80" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- 我的植物 - 拍摄 - 植物照片 -->
+        <mxCell id="r7" value="&lt;b&gt;拍摄&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="360" width="80" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- 用户 - 配置 - 提醒配置 -->
+        <mxCell id="r8" value="&lt;b&gt;配置&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="360" width="80" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- 用户 - 接收 - 消息提醒 -->
+        <mxCell id="r9" value="&lt;b&gt;接收&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="960" y="360" width="80" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- 用户 - 发布 - 论坛帖子 -->
+        <mxCell id="r10" value="&lt;b&gt;发布&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="570" width="80" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- 论坛帖子 - 包含 - 论坛评论 -->
+        <mxCell id="r11" value="&lt;b&gt;包含&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="380" y="680" width="80" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- 用户 - 点赞 - 论坛帖子 -->
+        <mxCell id="r12" value="&lt;b&gt;点赞&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="790" y="570" width="80" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- 论坛帖子 - 属于 - 论坛分类 -->
+        <mxCell id="r13" value="&lt;b&gt;属于&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="680" width="80" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- 用户 - 发布公告 - 系统公告 -->
+        <mxCell id="r14" value="&lt;b&gt;发布公告&lt;/b&gt;" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="650" y="760" width="90" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ====== 连线：实体到关系 ====== -->
+        <mxCell id="er1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_user" target="r1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_myplant" target="r1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_myplant" target="r2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_official" target="r2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_user" target="r3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_schedule" target="r3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_schedule" target="r4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_record" target="r4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_myplant" target="r5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_schedule" target="r5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_myplant" target="r6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_diary" target="r6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_myplant" target="r7"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_photo" target="r7"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_user" target="r8"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_reminder_config" target="r8"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_user" target="r9"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_reminder" target="r9"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_user" target="r10"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_post" target="r10"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_post" target="r11"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_comment" target="r11"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_user" target="r12"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_post" target="r12"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_post" target="r13"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_category" target="r13"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_user" target="r14"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="er28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333;" edge="1" parent="1" source="e_announce" target="r14"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ====== 基数标注 ====== -->
+        <mxCell id="c1" value="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#1a73e8;" vertex="1" parent="1"><mxGeometry x="755" y="155" width="20" height="20" as="geometry"/></mxCell>
+        <mxCell id="c2" value="N" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#1a73e8;" vertex="1" parent="1"><mxGeometry x="565" y="155" width="20" height="20" as="geometry"/></mxCell>
+        <mxCell id="c3" value="N" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#137333;" vertex="1" parent="1"><mxGeometry x="430" y="255" width="20" height="20" as="geometry"/></mxCell>
+        <mxCell id="c4" value="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#137333;" vertex="1" parent="1"><mxGeometry x="310" y="255" width="20" height="20" as="geometry"/></mxCell>
+        <mxCell id="c5" value="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#b05c00;" vertex="1" parent="1"><mxGeometry x="755" y="200" width="20" height="20" as="geometry"/></mxCell>
+        <mxCell id="c6" value="N" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#b05c00;" vertex="1" parent="1"><mxGeometry x="870" y="200" width="20" height="20" as="geometry"/></mxCell>
+        <mxCell id="c7" value="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#e65100;" vertex="1" parent="1"><mxGeometry x="980" y="255" width="20" height="20" as="geometry"/></mxCell>
+        <mxCell id="c8" value="N" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#e65100;" vertex="1" parent="1"><mxGeometry x="1115" y="255" width="20" height="20" as="geometry"/></mxCell>
+        <mxCell id="c9" value="N" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#7627bb;" vertex="1" parent="1"><mxGeometry x="650" y="570" width="20" height="20" as="geometry"/></mxCell>
+        <mxCell id="c10" value="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#7627bb;" vertex="1" parent="1"><mxGeometry x="390" y="550" width="20" height="20" as="geometry"/></mxCell>
+        <mxCell id="c11" value="N" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#7627bb;" vertex="1" parent="1"><mxGeometry x="440" y="720" width="20" height="20" as="geometry"/></mxCell>
+        <mxCell id="c12" value="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#7627bb;" vertex="1" parent="1"><mxGeometry x="340" y="660" width="20" height="20" as="geometry"/></mxCell>
+
+        <!-- 图例 -->
+        <mxCell id="leg_title" value="&lt;b&gt;图例&lt;/b&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="70" width="60" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg_e" value="实体（Entity）" style="shape=mxgraph.erEntity;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="110" width="110" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg_r" value="关系（Relationship）" style="shape=mxgraph.erRelationship;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="170" width="130" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg_a" value="属性（Attribute）" style="shape=mxgraph.erAttribute;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#333;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="240" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="leg_text" value="1 : N  一对多关系&lt;br&gt;M : N  多对多关系" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="310" width="200" height="50" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
