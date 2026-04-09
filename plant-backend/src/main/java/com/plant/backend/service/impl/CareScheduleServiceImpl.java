@@ -61,7 +61,18 @@ public class CareScheduleServiceImpl extends com.baomidou.mybatisplus.extension.
         if (!schedule.getUserId().equals(userId)) {
             throw new BusinessException(ResultCode.FORBIDDEN);
         }
-        if (schedule.getStatus() != 0) {
+
+        // 状态更新：允许将待完成(0)或已逾期(2)的计划标记为已完成(1)
+        if (request.getStatus() != null) {
+            if (request.getStatus() == 1 && (schedule.getStatus() == 0 || schedule.getStatus() == 2)) {
+                schedule.setStatus(1);
+            } else if (request.getStatus() != schedule.getStatus()) {
+                throw new BusinessException(ResultCode.BUSINESS_ERROR.getCode(), "不支持的状态变更");
+            }
+        }
+
+        // 其他字段仅在待完成状态下可修改
+        if (schedule.getStatus() != 0 && request.getStatus() == null) {
             throw new BusinessException(ResultCode.BUSINESS_ERROR.getCode(), "已完成或逾期的计划不可修改");
         }
 

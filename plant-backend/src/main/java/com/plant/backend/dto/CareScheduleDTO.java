@@ -53,7 +53,8 @@ public class CareScheduleDTO {
 
         private String reminderConfig;
 
-        // 状态更新 (标记为完成) 通常是分离或隐式的
+        /** 状态: 0=待完成, 1=已完成, 2=已逾期 */
+        private Integer status;
     }
 
     @Data

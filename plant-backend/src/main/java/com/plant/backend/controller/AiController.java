@@ -109,7 +109,7 @@ public class AiController extends BaseController {
      */
     @GetMapping("/conversation-history")
     public Result<AiDTO.ConversationHistoryResponse> getConversationHistory(
-            @RequestParam String sessionId,
+            @RequestParam(required = false) String sessionId,
             @RequestParam(required = false, defaultValue = "50") Integer limit,
             HttpServletRequest httpRequest) {
         Long userId = getUserIdFromRequest(httpRequest);
