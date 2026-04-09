@@ -748,3 +748,154 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid #e4e7ed !important;
 }
 
+
+/* ===== Mobile Optimizations ===== */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  /* Tighter layout */
+  .app-container {
+    padding: 12px;
+  }
+  
+  /* Cards */
+  .el-card {
+    border-radius: 12px;
+    
+    :deep(.el-card__body) {
+      padding: 16px;
+    }
+    
+    :deep(.el-card__header) {
+      padding: 12px 16px;
+    }
+  }
+  
+  /* Buttons - larger touch targets */
+  .el-button {
+    min-height: 40px;
+    padding: 8px 16px;
+  }
+  
+  .el-button--small {
+    min-height: 32px;
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  /* Inputs */
+  .el-input__inner,
+  .el-textarea__inner {
+    min-height: 40px;
+    font-size: 16px; /* Prevent iOS zoom */
+  }
+  
+  /* Dialogs */
+  .el-dialog {
+    width: 92% !important;
+    margin-top: 10vh !important;
+    border-radius: 16px;
+    
+    :deep(.el-dialog__header) {
+      padding: 16px;
+    }
+    
+    :deep(.el-dialog__body) {
+      padding: 12px 16px;
+      max-height: 55vh;
+      overflow-y: auto;
+    }
+    
+    :deep(.el-dialog__footer) {
+      padding: 12px 16px;
+    }
+  }
+  
+  /* Tables - horizontal scroll */
+  .el-table {
+    font-size: 13px;
+    
+    :deep(th) {
+      font-size: 12px;
+      padding: 8px 0;
+    }
+    
+    :deep(td) {
+      padding: 8px 0;
+    }
+  }
+  
+  /* Pagination */
+  .el-pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    
+    button {
+      min-width: 32px;
+      height: 32px;
+    }
+  }
+  
+  /* Form */
+  .el-form-item {
+    margin-bottom: 16px;
+    
+    :deep(.el-form-item__label) {
+      font-size: 14px;
+      padding-bottom: 4px;
+    }
+  }
+  
+  /* Tags */
+  .el-tag {
+    font-size: 12px;
+  }
+  
+  /* Headers */
+  h2 { font-size: 18px; }
+  h3 { font-size: 16px; }
+  
+  /* Responsive container */
+  .responsive-container {
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-container {
+    padding: 8px;
+  }
+  
+  .el-card :deep(.el-card__body) {
+    padding: 12px;
+  }
+  
+  .responsive-container {
+    padding: 0 8px;
+  }
+  
+  .el-dialog {
+    width: 96% !important;
+    margin-top: 5vh !important;
+  }
+}
+
+/* Safe area for notch phones */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .app-main {
+    padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
+  }
+  
+  .chat-input-area {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Prevent pull-to-refresh on mobile */
+html, body {
+  overscroll-behavior-y: contain;
+}

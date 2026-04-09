@@ -1,12 +1,18 @@
 <template>
   <div class="app-container">
+    <!-- 移动端会话列表覆盖层 -->
+    <div v-if="showMobileSidebar" class="mobile-sidebar-overlay" @click="showMobileSidebar = false"></div>
+
     <div class="ai-layout">
       <!-- 左侧历史会话列表 -->
-      <aside class="session-sidebar" :class="{ collapsed: sidebarCollapsed }">
+      <aside class="session-sidebar" :class="{ collapsed: sidebarCollapsed, 'mobile-open': showMobileSidebar }">
         <div class="sidebar-header">
           <h3 v-show="!sidebarCollapsed">对话历史</h3>
-          <el-button text circle size="small" @click="sidebarCollapsed = !sidebarCollapsed">
+          <el-button text circle size="small" @click="sidebarCollapsed = !sidebarCollapsed" class="desktop-only">
             <el-icon><DArrowLeft v-if="!sidebarCollapsed" /><DArrowRight v-else /></el-icon>
+          </el-button>
+          <el-button text circle size="small" @click="showMobileSidebar = false" class="mobile-only">
+            <el-icon><Close /></el-icon>
           </el-button>
         </div>
         <div v-show="!sidebarCollapsed" class="session-list">
@@ -20,7 +26,7 @@
             <div class="session-info">
               <div class="session-preview">{{ session.lastMessage || '新对话' }}</div>
               <div class="session-meta">
-                <span class="msg-count">{{ session.messageCount }}条对话</span>
+                <span class="msg-count">{{ session.messageCount }}条</span>
                 <span class="session-time">{{ formatTime(session.lastMessageTime) }}</span>
               </div>
             </div>
@@ -44,10 +50,13 @@
         <template #header>
           <div class="ai-header">
             <div class="header-content">
+              <el-button text circle class="mobile-only history-btn" @click="showMobileSidebar = true">
+                <el-icon :size="22"><ChatDotRound /></el-icon>
+              </el-button>
               <el-icon :size="24" color="var(--color-primary)"><ChatDotRound /></el-icon>
               <div class="title-area">
                 <h2>AI 植物顾问</h2>
-                <p>您的私人植物专家，随时解答养护难题</p>
+                <p class="desktop-only">您的私人植物专家，随时解答养护难题</p>
               </div>
             </div>
           </div>
@@ -82,28 +91,30 @@
           <el-input
             v-model="inputMessage"
             type="textarea"
-            :rows="3"
-            placeholder="请输入您的问题，例如：发财树叶子变黄了怎么办？"
+            :rows="mobile ? 2 : 3"
+            placeholder="请输入您的问题..."
             @keydown.enter.ctrl="sendMessage"
             resize="none"
             class="custom-textarea"
           />
           <div class="input-actions">
-            <span class="tip">按 Ctrl + Enter 发送</span>
-            <el-button size="small" @click="showApiKeyDialog = true" style="margin-right: 10px;">
-              <el-icon><Key /></el-icon>
-              {{ aiConfig.apiKey ? 'API Key 已配置' : '配置 API Key' }}
-            </el-button>
-            <el-button type="primary" @click="sendMessage" :loading="loading" round>
-              发送 <el-icon class="el-icon--right"><Position /></el-icon>
-            </el-button>
+            <span class="tip desktop-only">按 Ctrl + Enter 发送</span>
+            <div class="input-buttons">
+              <el-button size="small" @click="showApiKeyDialog = true">
+                <el-icon><Key /></el-icon>
+                <span class="desktop-only">{{ aiConfig.apiKey ? '已配置' : '配置 Key' }}</span>
+              </el-button>
+              <el-button type="primary" @click="sendMessage" :loading="loading" round>
+                发送 <el-icon class="el-icon--right"><Position /></el-icon>
+              </el-button>
+            </div>
           </div>
         </div>
       </el-card>
     </div>
 
     <!-- API Key 配置对话框 -->
-    <el-dialog v-model="showApiKeyDialog" title="DeepSeek API Key 配置" width="500px">
+    <el-dialog v-model="showApiKeyDialog" title="DeepSeek API Key 配置" width="500px" class="responsive-dialog">
       <el-form label-width="100px">
         <el-form-item label="API Key">
           <el-input v-model="aiConfig.apiKey" placeholder="请输入您的 DeepSeek API Key" type="password" show-password />
@@ -123,7 +134,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted, reactive } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted, reactive, computed } from 'vue'
 import {
   ChatDotRound, Position, Service, UserFilled, Key, Plus, Close,
   DArrowLeft, DArrowRight
@@ -138,7 +149,9 @@ const inputMessage = ref('')
 const loading = ref(false)
 const showApiKeyDialog = ref(false)
 const sidebarCollapsed = ref(false)
+const showMobileSidebar = ref(false)
 const sessionsLoading = ref(false)
+const mobile = ref(false)
 
 const currentSessionId = ref('')
 const sessionList = ref([])
@@ -167,6 +180,14 @@ function generateSessionId() {
   return 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
 }
 
+const checkMobile = () => {
+  mobile.value = window.innerWidth <= 768
+  if (mobile.value) {
+    sidebarCollapsed.value = true
+    showMobileSidebar.value = false
+  }
+}
+
 const loadSessions = async () => {
   sessionsLoading.value = true
   try {
@@ -182,6 +203,7 @@ const loadSessions = async () => {
 const loadSession = async (sessionId) => {
   if (sessionId === currentSessionId.value) return
   currentSessionId.value = sessionId
+  showMobileSidebar.value = false
   try {
     const data = await getConversationHistory(sessionId, 100)
     if (data?.messages?.length > 0) {
@@ -210,6 +232,7 @@ const newChat = () => {
     content: '你好！我是 Greenly 的 AI 植物顾问。请问有什么可以帮你的吗？',
     time: getCurrentTime()
   }]
+  showMobileSidebar.value = false
 }
 
 const handleDeleteSession = async (sessionId) => {
@@ -222,7 +245,6 @@ const handleDeleteSession = async (sessionId) => {
   } catch (e) { /* cancelled */ }
 }
 
-/** Save a message to backend for history */
 const saveToBackend = async (role, content) => {
   if (!aiConfig.apiKey) return
   try {
@@ -239,27 +261,21 @@ const saveToBackend = async (role, content) => {
       }
     })
   } catch (e) {
-    // Silent fail for history saving
     console.warn('Failed to save chat to backend:', e)
   }
 }
 
 const sendMessage = async () => {
   if (!inputMessage.value.trim()) return
-
-  const userMsg = inputMessage.value.trim()
-
-  // Generate session ID if needed
-  if (!currentSessionId.value) {
-    currentSessionId.value = generateSessionId()
-  }
+  if (!currentSessionId.value) currentSessionId.value = generateSessionId()
 
   messages.value.push({
     role: 'user',
-    content: userMsg,
+    content: inputMessage.value.trim(),
     time: getCurrentTime()
   })
 
+  const userMsg = inputMessage.value.trim()
   inputMessage.value = ''
   scrollToBottom()
 
@@ -269,40 +285,25 @@ const sendMessage = async () => {
   }
 
   loading.value = true
-
   try {
     const aiMessageIndex = messages.value.length
-    messages.value.push({
-      role: 'ai',
-      content: '',
-      time: getCurrentTime()
-    })
+    messages.value.push({ role: 'ai', content: '', time: getCurrentTime() })
 
     await generateAIResponse(
-      aiConfig.provider,
-      aiConfig.baseUrl,
-      aiConfig.apiKey,
-      aiConfig.model,
+      aiConfig.provider, aiConfig.baseUrl, aiConfig.apiKey, aiConfig.model,
       messages.value.slice(0, aiMessageIndex),
-      (chunkText) => {
-        messages.value[aiMessageIndex].content = chunkText
-        scrollToBottom()
-      }
+      (chunkText) => { messages.value[aiMessageIndex].content = chunkText; scrollToBottom() }
     )
 
-    // Save user + AI messages to backend for history
     const aiContent = messages.value[aiMessageIndex].content
     if (aiContent) {
       saveToBackend('user', userMsg)
       saveToBackend('assistant', aiContent)
-      // Refresh session list after a short delay
       setTimeout(loadSessions, 1000)
     }
   } catch (error) {
     ElMessage.error(error.message)
-    if (messages.value[messages.value.length - 1].content === '') {
-      messages.value.pop()
-    }
+    if (messages.value[messages.value.length - 1].content === '') messages.value.pop()
   } finally {
     loading.value = false
   }
@@ -310,24 +311,18 @@ const sendMessage = async () => {
 
 const scrollToBottom = () => {
   nextTick(() => {
-    if (messagesContainer.value) {
-      messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
-    }
+    if (messagesContainer.value) messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
   })
 }
 
 const formatMessage = (text) => {
   if (!text) return ''
-  let formatted = text.replace(/\n/g, '<br>')
-  formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-  return formatted
+  return text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
 }
 
 const formatTime = (timeStr) => {
   if (!timeStr) return ''
-  const d = new Date(timeStr)
-  const now = new Date()
-  const diff = now - d
+  const d = new Date(timeStr), now = new Date(), diff = now - d
   if (diff < 60000) return '刚刚'
   if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前'
   if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前'
@@ -352,115 +347,74 @@ onMounted(() => {
   if (savedConfig) Object.assign(aiConfig, JSON.parse(savedConfig))
   scrollToBottom()
   loadSessions()
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile)
 })
 </script>
 
 <style scoped lang="scss">
-.app-container {
-  min-height: calc(100vh - 120px);
-  display: flex;
+.app-container { min-height: calc(100vh - 120px); display: flex; position: relative; }
+
+/* Mobile overlay */
+.mobile-sidebar-overlay {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4); z-index: 100;
 }
 
-.ai-layout {
-  display: flex;
-  gap: 16px;
-  width: 100%;
-  min-height: calc(100vh - 160px);
-}
+.ai-layout { display: flex; gap: 16px; width: 100%; min-height: calc(100vh - 160px); }
 
 /* Sidebar */
 .session-sidebar {
-  width: 280px;
-  flex-shrink: 0;
-  background: white;
-  border-radius: 16px;
-  border: 1px solid rgba(0,0,0,0.05);
-  display: flex;
-  flex-direction: column;
-  transition: width 0.3s ease;
-  overflow: hidden;
-
-  &.collapsed {
-    width: 48px;
-    .sidebar-header h3 { display: none; }
-  }
+  width: 280px; flex-shrink: 0; background: white;
+  border-radius: 16px; border: 1px solid rgba(0,0,0,0.05);
+  display: flex; flex-direction: column; transition: width 0.3s ease; overflow: hidden;
+  &.collapsed { width: 48px; }
 }
 
 .sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px;
-  border-bottom: 1px solid var(--el-border-color-lighter);
-
-  h3 {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--el-text-color-primary);
-  }
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px; border-bottom: 1px solid var(--el-border-color-lighter);
+  h3 { margin: 0; font-size: 15px; font-weight: 600; color: var(--el-text-color-primary); }
 }
 
 .session-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px;
-
+  flex: 1; overflow-y: auto; padding: 8px;
   &::-webkit-scrollbar { width: 4px; }
   &::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 2px; }
 }
 
 .session-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 4px;
-
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px; border-radius: 10px; cursor: pointer;
+  transition: all 0.2s ease; margin-bottom: 4px;
   &:hover { background-color: #f5f7fa; }
   &.active { background-color: rgba(var(--el-color-primary-rgb), 0.08); border: 1px solid rgba(var(--el-color-primary-rgb), 0.2); }
 }
 
 .session-info { flex: 1; min-width: 0; }
 .session-preview {
-  font-size: 13px;
-  color: var(--el-text-color-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 4px;
-  font-weight: 500;
+  font-size: 13px; color: var(--el-text-color-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; font-weight: 500;
 }
-.session-meta {
-  display: flex;
-  gap: 8px;
-  font-size: 11px;
-  color: var(--el-text-color-secondary);
-}
+.session-meta { display: flex; gap: 8px; font-size: 11px; color: var(--el-text-color-secondary); }
 
-.sidebar-footer {
-  padding: 12px;
-  border-top: 1px solid var(--el-border-color-lighter);
-}
+.sidebar-footer { padding: 12px; border-top: 1px solid var(--el-border-color-lighter); }
 
 /* Main chat card */
 .ai-card {
-  flex: 1;
-  border-radius: 16px;
+  flex: 1; border-radius: 16px;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
-  border: 1px solid rgba(255,255,255,0.5);
-  background-color: rgba(255, 255, 255, 0.6);
-  display: flex;
-  flex-direction: column;
+  border: 1px solid rgba(255,255,255,0.5); background-color: rgba(255, 255, 255, 0.6);
+  display: flex; flex-direction: column;
 }
 
 .ai-header {
-  display: flex;
-  align-items: center;
-  padding: 16px 0;
+  display: flex; align-items: center; padding: 16px 0;
   .header-content {
     display: flex; align-items: center; gap: 16px;
     .title-area {
@@ -471,13 +425,8 @@ onMounted(() => {
 }
 
 .chat-messages {
-  flex: 1;
-  padding: 0;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  background-color: rgba(255,255,255,0.3);
+  flex: 1; padding: 0; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 24px; background-color: rgba(255,255,255,0.3);
   &::-webkit-scrollbar { width: 6px; }
   &::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 3px; }
 }
@@ -494,16 +443,12 @@ onMounted(() => {
   }
   &.ai-message {
     align-self: flex-start;
-    .message-content {
-      background: white; color: var(--color-text-main); border-bottom-left-radius: 4px;
-      .time { text-align: left; }
-    }
+    .message-content { background: white; color: var(--color-text-main); border-bottom-left-radius: 4px; }
   }
   .avatar { margin-top: 4px; flex-shrink: 0; }
   .message-content {
     padding: 12px 16px; border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    min-width: 60px; word-break: break-word;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); min-width: 60px; word-break: break-word;
     p { margin: 0; line-height: 1.6; font-size: 15px; }
     .time { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; display: block; }
   }
@@ -511,8 +456,7 @@ onMounted(() => {
 
 .chat-input-area {
   margin-top: 24px; padding: 16px 24px;
-  background: white; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05);
-  flex-shrink: 0;
+  background: white; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); flex-shrink: 0;
   .custom-textarea {
     :deep(.el-textarea__inner) {
       border: none; background-color: #f5f7fa; border-radius: 12px;
@@ -521,10 +465,10 @@ onMounted(() => {
     }
   }
   .input-actions {
-    display: flex; justify-content: flex-end; align-items: center;
-    margin-top: 12px; gap: 16px;
+    display: flex; justify-content: flex-end; align-items: center; margin-top: 12px; gap: 16px;
     .tip { font-size: 12px; color: var(--color-text-secondary); }
   }
+  .input-buttons { display: flex; gap: 8px; }
 }
 
 .ai-avatar { background-color: var(--color-primary-light-9); color: var(--color-primary); }
@@ -532,16 +476,44 @@ onMounted(() => {
 
 .typing-indicator {
   display: flex !important; gap: 4px; padding: 16px !important; align-items: center; min-height: 20px;
-  span { width: 6px; height: 6px; background-color: var(--color-text-secondary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; display: inline-block;
+  span { width: 6px; height: 6px; background-color: var(--color-text-secondary); border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both; display: inline-block;
     &:nth-child(1) { animation-delay: -0.32s; }
     &:nth-child(2) { animation-delay: -0.16s; }
   }
 }
-
 @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
+.history-btn { margin-right: 4px; }
+.desktop-only { display: inline-flex; }
+.mobile-only { display: none; }
+
+/* ===== Mobile ===== */
 @media (max-width: 768px) {
-  .ai-layout { flex-direction: column; }
-  .session-sidebar { width: 100%; max-height: 200px; }
+  .desktop-only { display: none !important; }
+  .mobile-only { display: inline-flex !important; }
+  .mobile-sidebar-overlay { display: block; }
+
+  .ai-layout { flex-direction: column; gap: 0; }
+
+  .session-sidebar {
+    position: fixed; left: -300px; top: 0; bottom: 0; z-index: 101;
+    width: 280px; border-radius: 0 16px 16px 0;
+    transition: left 0.3s ease;
+    &.mobile-open { left: 0; }
+    &.collapsed { width: 280px; }
+  }
+
+  .ai-card { border-radius: 12px; }
+
+  .ai-header .header-content .title-area h2 { font-size: 16px; }
+
+  .chat-messages { gap: 16px; }
+
+  .message-wrapper { max-width: 90%; }
+
+  .chat-input-area { padding: 12px; margin-top: 12px; }
+
+  .input-actions { justify-content: space-between !important; }
 }
 </style>
