@@ -21,16 +21,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-/**
- * AI 服务实现类
- * <p>
- * 提供植物识别、健康诊断、智能对话等功能，集成缓存机制优化性能
- * </p>
- *
- * @author Greenly Team
- * @date 2026-04-05
- * @version 2.0
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -41,30 +31,19 @@ public class AiServiceImpl implements AiService {
     private final CacheService cacheService;
     private final RestTemplate restTemplate;
 
-    /**
-     * AI 识别结果缓存键前缀
-     */
     private static final String CACHE_KEY_PREFIX = "ai:diagnosis:";
-
-    /**
-     * 缓存过期时间：24 小时
-     */
     private static final long CACHE_EXPIRE_HOURS = 24;
 
     @Override
     public AiDTO.ChatResponse chat(Long userId, AiDTO.ChatRequest request) {
         log.info("AI Chat request from user {}: message={}, provider={}", userId, request.getMessage(), request.getProvider());
 
-        // Save user message to database
         saveMessage(userId, request.getSessionId(), "user", request.getMessage(), request.getModel());
 
-        // Call AI API
         String aiResponse = callAiApi(request);
 
-        // Save AI response to database
         saveMessage(userId, request.getSessionId(), "assistant", aiResponse, request.getModel());
 
-        // Build response
         AiDTO.ChatResponse response = new AiDTO.ChatResponse();
         response.setContent(aiResponse);
         response.setModel(request.getModel());
@@ -79,10 +58,8 @@ public class AiServiceImpl implements AiService {
         log.info("AI Image diagnosis request from user {}: type={}, provider={}",
                 userId, request.getDiagnosisType(), request.getProvider());
 
-        // 生成缓存键（基于图片 URL 和诊断类型）
         String cacheKey = generateCacheKey(request.getImageUrl(), request.getDiagnosisType());
 
-        // 尝试从缓存获取结果
         AiDTO.ImageDiagnosisResponse cachedResponse = cacheService.get(cacheKey, AiDTO.ImageDiagnosisResponse.class);
         if (cachedResponse != null) {
             log.info("Cache hit for image diagnosis: key={}", cacheKey);
@@ -92,33 +69,26 @@ public class AiServiceImpl implements AiService {
         AiDTO.ImageDiagnosisResponse response = new AiDTO.ImageDiagnosisResponse();
 
         try {
-            // Use Baidu AI if provider is "baidu" or not specified
             if (request.getProvider() == null || "baidu".equals(request.getProvider())) {
                 Map<String, Object> baiduResult;
 
                 if ("identification".equals(request.getDiagnosisType())) {
                     baiduResult = baiduAiService.identifyPlant(request.getImageUrl());
-
                     response.setPlantName((String) baiduResult.get("plantName"));
                     response.setConfidence((Double) baiduResult.get("confidence"));
                     @SuppressWarnings("unchecked")
                     List<String> suggestions = (List<String>) baiduResult.get("suggestions");
                     response.setSuggestions(suggestions);
-
                 } else if ("disease".equals(request.getDiagnosisType())) {
                     baiduResult = baiduAiService.diagnoseDisease(request.getImageUrl());
-
                     response.setPlantName((String) baiduResult.get("plantName"));
                     response.setIssue((String) baiduResult.get("issue"));
                     response.setConfidence((Double) baiduResult.get("confidence"));
                     @SuppressWarnings("unchecked")
                     List<String> suggestions = (List<String>) baiduResult.get("suggestions");
                     response.setSuggestions(suggestions);
-
                 } else {
-                    // For care advice, first identify the plant then provide care suggestions
                     baiduResult = baiduAiService.identifyPlant(request.getImageUrl());
-
                     response.setPlantName((String) baiduResult.get("plantName"));
                     response.setConfidence((Double) baiduResult.get("confidence"));
                     @SuppressWarnings("unchecked")
@@ -130,11 +100,9 @@ public class AiServiceImpl implements AiService {
                         response.getPlantName(), response.getConfidence());
 
             } else {
-                // Fallback to mock data for other providers
                 response = generateMockDiagnosis(request);
             }
 
-            // 将结果存入缓存（24 小时过期）
             cacheService.set(cacheKey, response, CACHE_EXPIRE_HOURS, TimeUnit.HOURS);
             log.info("Cached diagnosis result: key={}", cacheKey);
 
@@ -148,9 +116,6 @@ public class AiServiceImpl implements AiService {
         return response;
     }
 
-    /**
-     * Generate mock diagnosis result (fallback)
-     */
     private AiDTO.ImageDiagnosisResponse generateMockDiagnosis(AiDTO.ImageDiagnosisRequest request) {
         AiDTO.ImageDiagnosisResponse response = new AiDTO.ImageDiagnosisResponse();
 
@@ -195,7 +160,7 @@ public class AiServiceImpl implements AiService {
         LambdaQueryWrapper<AiConversation> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(AiConversation::getUserId, userId)
                .eq(AiConversation::getSessionId, sessionId)
-               .ne(AiConversation::getRole, "system") // Exclude system messages
+               .ne(AiConversation::getRole, "system")
                .orderByAsc(AiConversation::getCreateTime)
                .last("LIMIT " + limit);
 
@@ -230,9 +195,39 @@ public class AiServiceImpl implements AiService {
         aiConversationMapper.delete(wrapper);
     }
 
-    /**
-     * Call external AI API
-     */
+    @Override
+    public List<AiDTO.SessionInfo> getSessionList(Long userId, int limit) {
+        if (limit <= 0) limit = 20;
+        LambdaQueryWrapper<AiConversation> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(AiConversation::getUserId, userId)
+               .orderByDesc(AiConversation::getCreateTime)
+               .last("LIMIT 500");
+        List<AiConversation> allConvs = aiConversationMapper.selectList(wrapper);
+        Map<String, AiConversation> sessionMap = new LinkedHashMap<>();
+        Map<String, Integer> countMap = new HashMap<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        for (AiConversation conv : allConvs) {
+            String sid = conv.getSessionId();
+            countMap.merge(sid, 1, Integer::sum);
+            if (!sessionMap.containsKey(sid)) { sessionMap.put(sid, conv); }
+        }
+        List<AiDTO.SessionInfo> result = new ArrayList<>();
+        int cnt = 0;
+        for (Map.Entry<String, AiConversation> entry : sessionMap.entrySet()) {
+            if (cnt >= limit) break;
+            AiDTO.SessionInfo info = new AiDTO.SessionInfo();
+            info.setSessionId(entry.getKey());
+            AiConversation last = entry.getValue();
+            String content = last.getContent();
+            info.setLastMessage(content != null && content.length() > 100 ? content.substring(0, 100) + "..." : content);
+            info.setLastMessageTime(last.getCreateTime().format(formatter));
+            info.setMessageCount(countMap.get(entry.getKey()));
+            result.add(info);
+            cnt++;
+        }
+        return result;
+    }
+
     private String callAiApi(AiDTO.ChatRequest request) {
         try {
             if ("gemini".equals(request.getProvider())) {
@@ -246,26 +241,20 @@ public class AiServiceImpl implements AiService {
         }
     }
 
-    /**
-     * Call OpenAI-compatible API (includes DeepSeek)
-     */
     private String callOpenAICompatibleApi(AiDTO.ChatRequest request) {
         String url = request.getBaseUrl() + "/chat/completions";
 
-        // Build request body
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", request.getModel() != null ? request.getModel() : "gpt-3.5-turbo");
         requestBody.put("stream", false);
 
         List<Map<String, String>> messages = new ArrayList<>();
 
-        // Add system prompt
         Map<String, String> systemMsg = new HashMap<>();
         systemMsg.put("role", "system");
         systemMsg.put("content", "你是一个叫 Greenly AI 的植物养护专家。请用专业、友好、简洁的中文回答关于植物养护、病虫害防治、植物识别等问题。如果用户问了与植物无关的问题，请委婉地将其引导回植物话题。");
         messages.add(systemMsg);
 
-        // Get recent conversation history for context
         List<AiConversation> history = getRecentHistory(request.getSessionId(), 10);
         for (AiConversation conv : history) {
             Map<String, String> msg = new HashMap<>();
@@ -274,7 +263,6 @@ public class AiServiceImpl implements AiService {
             messages.add(msg);
         }
 
-        // Add current message
         Map<String, String> userMsg = new HashMap<>();
         userMsg.put("role", "user");
         userMsg.put("content", request.getMessage());
@@ -282,14 +270,12 @@ public class AiServiceImpl implements AiService {
 
         requestBody.put("messages", messages);
 
-        // Set headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(request.getApiKey());
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
-        // Make API call
         @SuppressWarnings("unchecked")
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.POST, entity, (Class<Map<String, Object>>) (Class<?>) Map.class);
 
@@ -307,36 +293,26 @@ public class AiServiceImpl implements AiService {
         throw new RuntimeException("Invalid response from AI API");
     }
 
-    /**
-     * Call Google Gemini API
-     */
     private String callGeminiApi(AiDTO.ChatRequest request) {
         String model = request.getModel() != null ? request.getModel() : "gemini-1.5-flash";
         String url = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + request.getApiKey();
 
-        // Build request body
         Map<String, Object> requestBody = new HashMap<>();
-
         List<Map<String, Object>> contents = new ArrayList<>();
 
-        // Get recent conversation history
         List<AiConversation> history = getRecentHistory(request.getSessionId(), 10);
         for (AiConversation conv : history) {
             if ("system".equals(conv.getRole())) continue;
-
             Map<String, Object> content = new HashMap<>();
             content.put("role", "user".equals(conv.getRole()) ? "user" : "model");
-
             List<Map<String, String>> parts = new ArrayList<>();
             Map<String, String> part = new HashMap<>();
             part.put("text", conv.getContent());
             parts.add(part);
-
             content.put("parts", parts);
             contents.add(content);
         }
 
-        // Add current message
         Map<String, Object> currentContent = new HashMap<>();
         currentContent.put("role", "user");
         List<Map<String, String>> parts = new ArrayList<>();
@@ -348,7 +324,6 @@ public class AiServiceImpl implements AiService {
 
         requestBody.put("contents", contents);
 
-        // Add system instruction
         Map<String, Object> systemInstruction = new HashMap<>();
         List<Map<String, String>> systemParts = new ArrayList<>();
         Map<String, String> systemPart = new HashMap<>();
@@ -357,13 +332,11 @@ public class AiServiceImpl implements AiService {
         systemInstruction.put("parts", systemParts);
         requestBody.put("systemInstruction", systemInstruction);
 
-        // Set headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
-        // Make API call
         @SuppressWarnings("unchecked")
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.POST, entity, (Class<Map<String, Object>>) (Class<?>) Map.class);
 
@@ -385,9 +358,6 @@ public class AiServiceImpl implements AiService {
         throw new RuntimeException("Invalid response from Gemini API");
     }
 
-    /**
-     * Get recent conversation history
-     */
     private List<AiConversation> getRecentHistory(String sessionId, int limit) {
         LambdaQueryWrapper<AiConversation> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(AiConversation::getSessionId, sessionId)
@@ -396,13 +366,10 @@ public class AiServiceImpl implements AiService {
                .last("LIMIT " + limit);
 
         List<AiConversation> history = aiConversationMapper.selectList(wrapper);
-        Collections.reverse(history); // Reverse to get chronological order
+        Collections.reverse(history);
         return history;
     }
 
-    /**
-     * Save message to database
-     */
     private void saveMessage(Long userId, String sessionId, String role, String content, String model) {
         AiConversation conversation = new AiConversation();
         conversation.setUserId(userId);
@@ -415,31 +382,16 @@ public class AiServiceImpl implements AiService {
         aiConversationMapper.insert(conversation);
     }
 
-    /**
-     * Estimate token count (rough estimation)
-     */
     private Integer estimateTokens(String text) {
-        // Rough estimation: 1 token ≈ 4 characters for English, 1-2 for Chinese
         return text.length() / 2;
     }
 
-    /**
-     * 生成缓存键
-     * <p>
-     * 基于图片 URL 和诊断类型生成唯一的缓存键，使用 SHA-256 哈希确保键的唯一性和安全性
-     * </p>
-     *
-     * @param imageUrl 图片 URL
-     * @param diagnosisType 诊断类型（identification/disease/care）
-     * @return 缓存键（格式：ai:diagnosis:{hash}）
-     */
     private String generateCacheKey(String imageUrl, String diagnosisType) {
         try {
             String rawKey = imageUrl + ":" + diagnosisType;
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(rawKey.getBytes(StandardCharsets.UTF_8));
 
-            // 将字节数组转换为十六进制字符串
             StringBuilder hexString = new StringBuilder();
             for (byte b : hash) {
                 String hex = Integer.toHexString(0xff & b);
@@ -452,7 +404,6 @@ public class AiServiceImpl implements AiService {
             return CACHE_KEY_PREFIX + hexString.toString();
         } catch (Exception e) {
             log.warn("Failed to generate cache key using SHA-256, fallback to simple key", e);
-            // 降级方案：使用简单拼接（可能存在特殊字符问题）
             return CACHE_KEY_PREFIX + imageUrl.hashCode() + ":" + diagnosisType;
         }
     }

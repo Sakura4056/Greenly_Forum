@@ -24,10 +24,6 @@ export function diagnoseImage(data) {
 
 /**
  * Identify Plant (Baidu AI)
- * @param {Object} data - 识别请求数据
- * @param {string} data.image - 图片 Base64 编码（与 imageUrl 二选一）
- * @param {string} data.imageUrl - 图片 URL（与 image 二选一）
- * @returns {Promise} 植物识别结果
  */
 export function identifyPlant(data) {
     return request({
@@ -55,5 +51,47 @@ export function deleteSession(sessionId) {
     return request({
         url: `/ai/session/${sessionId}`,
         method: 'delete'
+    })
+}
+
+/**
+ * Get identify history list
+ */
+export function getIdentifyHistory(limit = 20) {
+    return request({
+        url: '/ai/identify-history',
+        method: 'get',
+        params: { limit }
+    })
+}
+
+/**
+ * Delete a single identify history record
+ */
+export function deleteIdentifyHistory(id) {
+    return request({
+        url: `/ai/identify-history/${id}`,
+        method: 'delete'
+    })
+}
+
+/**
+ * Clear all identify history
+ */
+export function clearIdentifyHistory() {
+    return request({
+        url: '/ai/identify-history',
+        method: 'delete'
+    })
+}
+
+/**
+ * Get AI chat session list
+ */
+export function getSessionList(limit = 20) {
+    return request({
+        url: '/ai/sessions',
+        method: 'get',
+        params: { limit }
     })
 }

@@ -3,16 +3,13 @@ package com.plant.backend.dto;
 import lombok.Data;
 import java.util.List;
 
-/**
- * AI Related DTOs
- */
 public class AiDTO {
 
     @Data
     public static class ChatRequest {
         private String message;
         private String sessionId;
-        private String provider; // deepseek/openai/gemini
+        private String provider;
         private String model;
         private String apiKey;
         private String baseUrl;
@@ -29,7 +26,7 @@ public class AiDTO {
     @Data
     public static class ImageDiagnosisRequest {
         private String imageUrl;
-        private String diagnosisType; // identification/disease/care
+        private String diagnosisType;
         private String provider;
         private String apiKey;
     }
@@ -61,5 +58,13 @@ public class AiDTO {
         private String sessionId;
         private List<ConversationMessage> messages;
         private Integer total;
+    }
+
+    @Data
+    public static class SessionInfo {
+        private String sessionId;
+        private String lastMessage;
+        private String lastMessageTime;
+        private Integer messageCount;
     }
 }

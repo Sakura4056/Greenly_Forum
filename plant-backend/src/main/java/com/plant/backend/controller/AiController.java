@@ -3,20 +3,21 @@ package com.plant.backend.controller;
 import com.plant.backend.base.BaseController;
 import com.plant.backend.dto.AiDTO;
 import com.plant.backend.dto.PlantDetectDTO;
+import com.plant.backend.entity.IdentifyHistory;
 import com.plant.backend.service.AiService;
 import com.plant.backend.service.BaiduAiService;
+import com.plant.backend.service.IdentifyHistoryService;
 import com.plant.backend.util.JwtUtil;
 import com.plant.backend.util.Result;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
-/**
- * AI Controller
- */
 @Slf4j
 @RestController
 @RequestMapping("/api/ai")
@@ -25,29 +26,22 @@ public class AiController extends BaseController {
 
     private final AiService aiService;
     private final BaiduAiService baiduAiService;
+    private final IdentifyHistoryService identifyHistoryService;
     private final JwtUtil jwtUtil;
+    private final ObjectMapper objectMapper;
 
-    /**
-     * Chat with AI
-     */
     @PostMapping("/chat")
     public Result<AiDTO.ChatResponse> chat(@RequestBody AiDTO.ChatRequest request, HttpServletRequest httpRequest) {
         Long userId = getUserIdFromRequest(httpRequest);
         return Result.success(aiService.chat(userId, request));
     }
 
-    /**
-     * Diagnose plant from image
-     */
     @PostMapping("/diagnose-image")
     public Result<AiDTO.ImageDiagnosisResponse> diagnoseImage(@RequestBody AiDTO.ImageDiagnosisRequest request, HttpServletRequest httpRequest) {
         Long userId = getUserIdFromRequest(httpRequest);
         return Result.success(aiService.diagnoseImage(userId, request));
     }
 
-    /**
-     * Identify plant from image (Baidu AI)
-     */
     @PostMapping("/identify-plant")
     public Result<PlantDetectDTO.DetectResponse> identifyPlant(
             @RequestBody PlantDetectDTO.DetectRequest request, 
@@ -55,7 +49,6 @@ public class AiController extends BaseController {
         Long userId = getUserIdFromRequest(httpRequest);
         
         try {
-            // Determine if using URL or base64
             String imageData = request.getImageUrl() != null ? request.getImageUrl() : request.getImage();
             
             if (imageData == null || imageData.isEmpty()) {
@@ -65,10 +58,8 @@ public class AiController extends BaseController {
                 return Result.success(errorResponse);
             }
             
-            // Call Baidu AI service
             Map<String, Object> result = baiduAiService.identifyPlant(imageData);
             
-            // Convert to response DTO
             PlantDetectDTO.DetectResponse response = new PlantDetectDTO.DetectResponse();
             response.setSuccess(true);
             
@@ -76,21 +67,31 @@ public class AiController extends BaseController {
             plantResult.setName((String) result.getOrDefault("plantName", "未知植物"));
             plantResult.setScore((Double) result.getOrDefault("confidence", 0.0));
             
-            // Extract suggestions as classification info
             @SuppressWarnings("unchecked")
-            java.util.List<String> suggestions = (java.util.List<String>) result.get("suggestions");
+            List<String> suggestions = (List<String>) result.get("suggestions");
             if (suggestions != null && !suggestions.isEmpty()) {
                 plantResult.setClassification(String.join("\n", suggestions));
             }
             
-            // Extract baike info if available
             @SuppressWarnings("unchecked")
             Map<String, String> baikeInfo = (Map<String, String>) result.get("baikeInfo");
+            String baikeUrl = null;
             if (baikeInfo != null) {
-                plantResult.setBaikeUrl(baikeInfo.get("url"));
+                baikeUrl = baikeInfo.get("url");
+                plantResult.setBaikeUrl(baikeUrl);
             }
             
             response.setResults(java.util.Collections.singletonList(plantResult));
+            
+            // Save identify history
+            try {
+                String rawJson = objectMapper.writeValueAsString(result);
+                String imageUrl = request.getImageUrl() != null ? request.getImageUrl() : "[base64]";
+                identifyHistoryService.saveHistory(userId, imageUrl, plantResult.getName(),
+                        plantResult.getScore(), baikeUrl, plantResult.getClassification(), rawJson);
+            } catch (Exception e) {
+                log.warn("Failed to save identify history: {}", e.getMessage());
+            }
             
             log.info("User {} identified plant: {}", userId, plantResult.getName());
             return Result.success(response);
@@ -104,9 +105,6 @@ public class AiController extends BaseController {
         }
     }
 
-    /**
-     * Get conversation history
-     */
     @GetMapping("/conversation-history")
     public Result<AiDTO.ConversationHistoryResponse> getConversationHistory(
             @RequestParam(required = false) String sessionId,
@@ -116,9 +114,6 @@ public class AiController extends BaseController {
         return Result.success(aiService.getConversationHistory(userId, sessionId, limit));
     }
 
-    /**
-     * Delete conversation session
-     */
     @DeleteMapping("/session/{sessionId}")
     public Result<Void> deleteSession(@PathVariable String sessionId, HttpServletRequest httpRequest) {
         Long userId = getUserIdFromRequest(httpRequest);
@@ -126,9 +121,40 @@ public class AiController extends BaseController {
         return Result.success(null);
     }
 
-    /**
-     * Extract user ID from JWT token
-     */
+    // ========== Identify History Endpoints ==========
+
+    @GetMapping("/identify-history")
+    public Result<List<IdentifyHistory>> getIdentifyHistory(
+            @RequestParam(required = false, defaultValue = "20") Integer limit,
+            HttpServletRequest httpRequest) {
+        Long userId = getUserIdFromRequest(httpRequest);
+        return Result.success(identifyHistoryService.getUserHistory(userId, limit));
+    }
+
+    @DeleteMapping("/identify-history/{id}")
+    public Result<Void> deleteIdentifyHistory(@PathVariable Long id, HttpServletRequest httpRequest) {
+        Long userId = getUserIdFromRequest(httpRequest);
+        identifyHistoryService.deleteHistory(userId, id);
+        return Result.success(null);
+    }
+
+    @DeleteMapping("/identify-history")
+    public Result<Void> clearIdentifyHistory(HttpServletRequest httpRequest) {
+        Long userId = getUserIdFromRequest(httpRequest);
+        identifyHistoryService.clearHistory(userId);
+        return Result.success(null);
+    }
+
+    // ========== Conversation Session List ==========
+
+    @GetMapping("/sessions")
+    public Result<List<AiDTO.SessionInfo>> getSessionList(
+            @RequestParam(required = false, defaultValue = "20") Integer limit,
+            HttpServletRequest httpRequest) {
+        Long userId = getUserIdFromRequest(httpRequest);
+        return Result.success(aiService.getSessionList(userId, limit));
+    }
+
     private Long getUserIdFromRequest(HttpServletRequest request) {
         String token = extractToken(request);
         if (token == null) {
