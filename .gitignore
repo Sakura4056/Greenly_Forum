@@ -109,3 +109,6 @@ plant-frontend/hash.txt
 
 # Apifox 缓存
 **/.apifox-helper/
+
+# Backups
+backups/

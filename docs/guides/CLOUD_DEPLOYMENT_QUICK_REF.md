@@ -20,66 +20,98 @@ sudo bash /tmp/deploy-to-cloud.sh
 ### 1️⃣ 环境准备
 
 ```bash
-# 安装必需软件（Ubuntu）
-sudo apt update
-sudo apt install -y openjdk-21-jdk mysql-server redis-server nginx
+# Alibaba Cloud Linux 3 / CentOS
+yum install -y java-21-alibaba-dragonwell mysql-server redis nginx
+systemctl start mysqld redis nginx
+systemctl enable mysqld redis nginx
 
-# 启动服务
-sudo systemctl start mysql redis nginx
-sudo systemctl enable mysql redis nginx
+# Ubuntu / Debian
+# apt update && apt install -y openjdk-21-jdk mysql-server redis-server nginx
 ```
 
 ### 2️⃣ 数据库初始化
 
 ```bash
-# 创建数据库
 mysql -u root -e "CREATE DATABASE greenly_db CHARACTER SET utf8mb4;"
-
-# 导入数据
 mysql -u root greenly_db < plant-backend/src/main/resources/db/greenly-init.sql
 ```
 
 ### 3️⃣ 部署后端
 
 ```bash
-# 打包
 cd plant-backend
 mvn clean package -DskipTests
 
-# 上传到服务器
-scp target/plant-backend-0.0.1-SNAPSHOT.jar root@server:/opt/greenly/
+# 配置环境变量
+cp .env.example .env
+# 编辑 .env 填写数据库连接等配置
 
-# 启动
-nohup java -jar /opt/greenly/plant-backend-0.0.1-SNAPSHOT.jar &
+# 用 systemd 管理（推荐）
+cat > /etc/systemd/system/greenly-backend.service << 'EOF'
+[Unit]
+Description=Greenly Plant Care Backend
+After=network.target mysqld.service redis.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/new_new_Greenly/plant-backend
+EnvironmentFile=/opt/new_new_Greenly/plant-backend/.env
+ExecStart=/usr/bin/java -Xms256m -Xmx512m -jar /opt/new_new_Greenly/plant-backend/target/plant-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable greenly-backend
+systemctl start greenly-backend
 ```
 
 ### 4️⃣ 部署前端
 
 ```bash
-# 构建
 cd plant-frontend
+npm install
 npm run build
 
-# 上传
-scp -r dist/* root@server:/var/www/html/
+# Nginx 直接从 dist 目录提供服务
+# 无需单独拷贝，配置 root 指向 dist 即可
 ```
 
 ### 5️⃣ 配置 Nginx
 
 ```nginx
 server {
-    listen 80;
     server_name your-domain.com;
-    
-    location /api/ {
-        proxy_pass http://localhost:9090/api/;
-    }
-    
+    root /opt/new_new_Greenly/plant-frontend/dist;
+    index index.html;
+
+    # Vue Router history mode
     location / {
-        root /var/www/html;
         try_files $uri $uri/ /index.html;
     }
+
+    # API 反向代理
+    location /api/ {
+        proxy_pass http://127.0.0.1:9090;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        client_max_body_size 50M;
+    }
+
+    # HTTPS（certbot 自动配置）
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/your-domain/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/your-domain/privkey.pem;
 }
+```
+
+```bash
+nginx -t && systemctl reload nginx
 ```
 
 ---
@@ -88,9 +120,9 @@ server {
 
 | 用户数 | CPU | 内存 | 带宽 | 月费用 |
 |--------|-----|------|------|--------|
-| 10-30人 | 2核 | 4GB | 3Mbps | ¥100-200 |
-| 30-100人 | 4核 | 8GB | 5Mbps | ¥300-500 |
-| 100+人 | 8核 | 16GB | 10Mbps | ¥800+ |
+| 10-30 人 | 2 核 | 4GB | 3Mbps | ¥100-200 |
+| 30-100 人 | 4 核 | 8GB | 5Mbps | ¥300-500 |
+| 100+ 人 | 8 核 | 16GB | 10Mbps | ¥800+ |
 
 ---
 
@@ -109,59 +141,53 @@ server {
 
 ```bash
 # 查看服务状态
-sudo systemctl status greenly
-sudo systemctl status mysql
-sudo systemctl status redis
-sudo systemctl status nginx
+systemctl status greenly-backend
+systemctl status mysqld
+systemctl status redis
+systemctl status nginx
 
 # 查看日志
-sudo journalctl -u greenly -f
-sudo tail -f /var/log/nginx/error.log
+journalctl -u greenly-backend -f
+tail -f /var/log/nginx/error.log
 
 # 重启服务
-sudo systemctl restart greenly
-sudo systemctl restart nginx
+systemctl restart greenly-backend
+systemctl reload nginx
 
 # 备份数据库
-mysqldump -u greenly -p greenly_db > backup_$(date +%Y%m%d).sql
+mysqldump -u root -p greenly_db | gzip > backup_$(date +%Y%m%d).sql.gz
 ```
 
 ---
 
 ## 🆘 故障排查
 
-### 后端无法启动
+**后端无法启动**：
 ```bash
-sudo journalctl -u greenly -n 50
+journalctl -u greenly-backend -n 50 --no-pager
 ```
 
-### 前端无法访问后端
+**前端无法访问后端**：
 ```bash
-# 检查 Nginx 配置
-sudo nginx -t
-sudo systemctl reload nginx
-
-# 测试后端
+nginx -t
 curl http://localhost:9090/actuator/health
 ```
 
-### 数据库连接失败
+**数据库连接失败**：
 ```bash
-# 检查 MySQL 状态
-sudo systemctl status mysql
-
-# 测试连接
-mysql -u greenly -p greenly_db -e "SELECT 1"
+systemctl status mysqld
+mysql -u root -p -e "SELECT 1"
 ```
 
 ---
 
-## 📞 获取帮助
+## 📚 相关文档
 
-- 📖 [完整部署指南](CLOUD_DEPLOYMENT_GUIDE.md)
-- 🔍 [常见问题](../troubleshooting/common-issues.md)
-- 🐛 提交 Issue
+- [完整部署指南](CLOUD_DEPLOYMENT_GUIDE.md)
+- [部署指南](DEPLOYMENT.md)
+- [常见问题](../troubleshooting/common-issues.md)
+- [数据库备份](DATABASE_BACKUP_GUIDE.md)
 
 ---
 
-*快速参考卡 - 最后更新: 2026-04-09*
+*v2.0 — 2026-04-09 更新：适配阿里云 Linux，统一服务名和路径*

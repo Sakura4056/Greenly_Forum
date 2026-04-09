@@ -72,7 +72,7 @@ jwt:
 # 日志
 logging:
   level:
-    com.plant.backend: DEBUG
+    com.plant.backend: INFO
     org.springframework: INFO
     com.zaxxer.hikari: INFO
   charset:

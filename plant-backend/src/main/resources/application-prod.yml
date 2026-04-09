@@ -2,7 +2,7 @@
 # 使用方法: java -jar plant-backend.jar --spring.profiles.active=prod
 
 server:
-  port: 8085
+  port: 9090
 
 spring:
   application:
@@ -102,7 +102,7 @@ logging:
 
 # 应用特定配置
 app:
-  file-upload-path: ${UPLOAD_PATH:/data/uploads/}
+  file-upload-path: /opt/new_new_Greenly/data/uploads/
 
 # Actuator 监控配置
 management:
