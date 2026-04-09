@@ -38,9 +38,6 @@
             />
             <h2 class="page-title" aria-level="1">植物养护管理系统</h2>
           </div>
-          <div class="header-center">
-            <GlobalSearch />
-          </div>
           <div class="header-right">
             <!-- 智能浇水提醒 -->
             <WateringNotification />
@@ -168,7 +165,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import Sidebar from './components/Sidebar.vue'
-import GlobalSearch from '@/components/business/GlobalSearch.vue'
 import WateringNotification from '@/components/business/WateringNotification.vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
