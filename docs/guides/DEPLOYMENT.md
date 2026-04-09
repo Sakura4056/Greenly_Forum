@@ -1,7 +1,7 @@
 # Greenly 生产环境部署指南
 
 **文档版本**: v1.0  
-**最后更新**: 2026-04-05  
+**最后更新: 2026-04-09  
 **维护者**: Greenly 开发团队
 
 ---
@@ -36,7 +36,7 @@
 
 | 服务 | 默认端口 | 说明 |
 |------|---------|------|
-| Spring Boot | 8085 | 后端API服务 |
+| Spring Boot | 9090 | 后端API服务 |
 | MySQL | 3306 | 数据库 |
 | Redis | 6379 | 缓存 |
 | Nginx | 80/443 | Web服务器 |
@@ -212,7 +212,7 @@ BAIDU_AI_API_KEY=your_api_key
 BAIDU_AI_SECRET_KEY=your_secret_key
 
 # 应用配置
-SERVER_PORT=8085
+SERVER_PORT=9090
 FILE_UPLOAD_PATH=/opt/greenly/data/uploads/
 ```
 
@@ -457,7 +457,7 @@ server {
 
     # API反向代理
     location /api/ {
-        proxy_pass http://localhost:8085/api/;
+        proxy_pass http://localhost:9090/api/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -533,7 +533,7 @@ sudo chmod 600 /etc/nginx/ssl/*
 后端提供Actuator端点:
 
 ```bash
-curl http://localhost:8085/actuator/health
+curl http://localhost:9090/actuator/health
 ```
 
 响应:
@@ -616,7 +616,7 @@ redis-cli info stats
 sudo journalctl -u greenly -n 100 --no-pager
 
 # 检查端口占用
-sudo lsof -i :8085
+sudo lsof -i :9090
 
 # 检查Java版本
 java -version

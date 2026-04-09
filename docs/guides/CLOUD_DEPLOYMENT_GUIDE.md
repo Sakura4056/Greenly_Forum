@@ -178,7 +178,7 @@ sudo nano /opt/greenly/application-prod.yml
 
 ```yaml
 server:
-  port: 8085
+  port: 9090
 
 spring:
   datasource:
@@ -333,7 +333,7 @@ server {
 
     # API 反向代理
     location /api/ {
-        proxy_pass http://localhost:8085/api/;
+        proxy_pass http://localhost:9090/api/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -371,7 +371,7 @@ sudo systemctl reload nginx
 
 ```bash
 # 1. 检查后端健康状态
-curl http://localhost:8085/actuator/health
+curl http://localhost:9090/actuator/health
 
 # 2. 浏览器访问
 # http://your-server-ip 或 http://your-domain.com
@@ -669,7 +669,7 @@ sudo journalctl -u greenly -n 50
 
 # 常见原因：
 # 1. 端口被占用
-sudo lsof -i :8085
+sudo lsof -i :9090
 
 # 2. 数据库连接失败
 mysql -u greenly -p -e "SELECT 1"
@@ -687,7 +687,7 @@ sudo nginx -t
 sudo systemctl reload nginx
 
 # 检查后端是否正常
-curl http://localhost:8085/actuator/health
+curl http://localhost:9090/actuator/health
 ```
 
 ### Q3: 图片上传失败
@@ -773,5 +773,5 @@ sudo certbot certificates
 
 ---
 
-*最后更新: 2026-04-06*  
+*最后更新: 2026-04-09*  
 *维护者: Greenly 开发团队*

@@ -224,5 +224,5 @@ Get-Content plant-backend/target/classes/db/greenly-tables.sql | mysql -u root -
 
 ---
 
-*最后更新：2026-04-06*  
+*最后更新：2026-04-09*  
 *维护者：Greenly 开发团队*

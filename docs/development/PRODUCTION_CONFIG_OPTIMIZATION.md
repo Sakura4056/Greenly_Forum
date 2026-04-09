@@ -23,7 +23,7 @@
 
 ```yaml
 server:
-  port: 8085
+  port: 9090
   tomcat:
     threads:
       max: 200
@@ -136,7 +136,7 @@ innodb_buffer_pool_size = 2G
 
 ```yaml
 server:
-  port: 8085
+  port: 9090
   tomcat:
     threads:
       max: 300
@@ -282,7 +282,7 @@ http {
 
 ```yaml
 server:
-  port: 8085
+  port: 9090
   tomcat:
     threads:
       max: 500
@@ -462,13 +462,13 @@ sudo systemctl status greenly
 
 ```bash
 # 检查健康状态
-curl http://localhost:8085/actuator/health
+curl http://localhost:9090/actuator/health
 
 # 查看日志
 sudo journalctl -u greenly -f
 
 # 压力测试（可选）
-ab -n 100 -c 10 http://localhost:8085/api/plant/list
+ab -n 100 -c 10 http://localhost:9090/api/plant/list
 ```
 
 ---
@@ -526,7 +526,7 @@ free -h
 mysql -e "SHOW STATUS LIKE 'Threads_connected';"
 
 # 响应时间 > 500ms → 优化查询或增加资源
-curl -w "@curl-format.txt" -o /dev/null -s http://localhost:8085/api/plant/list
+curl -w "@curl-format.txt" -o /dev/null -s http://localhost:9090/api/plant/list
 ```
 
 ### Q2: 配置改错了怎么办？
@@ -545,7 +545,7 @@ sudo systemctl restart greenly
 sudo apt install apache2-utils
 
 # 测试
-ab -n 1000 -c 50 http://localhost:8085/api/plant/list
+ab -n 1000 -c 50 http://localhost:9090/api/plant/list
 
 # 关注指标：
 # Requests per second: 越高越好
@@ -557,4 +557,4 @@ ab -n 1000 -c 50 http://localhost:8085/api/plant/list
 
 **💡 提示**: 大多数场景下，**方案 B** 已经足够。建议从方案 B 开始，根据实际使用情况再调整。
 
-*最后更新: 2026-04-06*
+*最后更新: 2026-04-09*

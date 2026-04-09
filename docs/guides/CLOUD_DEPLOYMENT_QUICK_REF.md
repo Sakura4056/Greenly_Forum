@@ -72,7 +72,7 @@ server {
     server_name your-domain.com;
     
     location /api/ {
-        proxy_pass http://localhost:8085/api/;
+        proxy_pass http://localhost:9090/api/;
     }
     
     location / {
@@ -142,7 +142,7 @@ sudo nginx -t
 sudo systemctl reload nginx
 
 # 测试后端
-curl http://localhost:8085/actuator/health
+curl http://localhost:9090/actuator/health
 ```
 
 ### 数据库连接失败
@@ -164,4 +164,4 @@ mysql -u greenly -p greenly_db -e "SELECT 1"
 
 ---
 
-*快速参考卡 - 最后更新: 2026-04-06*
+*快速参考卡 - 最后更新: 2026-04-09*

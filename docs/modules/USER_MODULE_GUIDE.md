@@ -1,6 +1,6 @@
 # 用户系统模块使用指南
 
-> 📅 最后更新：2026-04-03  
+> 📅 最后更新：2026-04-09  
 > 👨‍💻 维护者：Greenly 开发团队
 
 ---
@@ -113,7 +113,7 @@ CREATE TABLE `sys_user` (
 
 ### 基础信息
 
-- **Base URL**: `http://localhost:8085/api`
+- **Base URL**: `http://localhost:9090/api`
 - **认证方式**: JWT Bearer Token
 - **请求格式**: JSON
 - **响应格式**: 

@@ -178,10 +178,10 @@ io.lettuce.core.RedisCommandTimeoutException: Command timed out
 2. **API 测试**
    ```bash
    # 第一次请求（缓存未命中）
-   curl http://localhost:8085/api/plant/official/query?keyword=test
+   curl http://localhost:9090/api/plant/official/query?keyword=test
 
    # 第二次请求（应该从缓存读取）
-   curl http://localhost:8085/api/plant/official/query?keyword=test
+   curl http://localhost:9090/api/plant/official/query?keyword=test
    ```
 
 3. **Redis CLI 监控**
@@ -215,5 +215,5 @@ io.lettuce.core.RedisCommandTimeoutException: Command timed out
 
 ---
 
-**最后更新**: 2026-04-04
+**最后更新: 2026-04-09
 **维护者**: Greenly 开发团队

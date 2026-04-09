@@ -320,7 +320,7 @@ spring.data.redis.port=6379
 
 4. 测试 API
    ```bash
-   curl -X POST http://localhost:8085/api/user/login \
+   curl -X POST http://localhost:9090/api/user/login \
      -H "Content-Type: application/json" \
      -d '{"username":"admin","password":"admin123"}'
    ```
@@ -420,7 +420,7 @@ cannot find symbol
 
 **错误现象**：
 ```
-Port 8085 was already in use
+Port 9090 was already in use
 ```
 
 **解决方法**：
@@ -428,11 +428,11 @@ Port 8085 was already in use
 1. 查找占用进程
    ```bash
    # Windows
-   netstat -ano | findstr :8085
+   netstat -ano | findstr :9090
    taskkill /F /PID <PID>
    
    # 或使用 PowerShell
-   Get-Process -Id (Get-NetTCPConnection -LocalPort 8085).OwningProcess
+   Get-Process -Id (Get-NetTCPConnection -LocalPort 9090).OwningProcess
    ```
 
 2. 修改端口
@@ -525,7 +525,7 @@ cd plant-backend; mvn spring-boot:run
 cd plant-frontend; npm run dev
 
 # 4. API 测试
-curl http://localhost:8085/actuator
+curl http://localhost:9090/actuator
 ```
 
 ---
@@ -633,5 +633,5 @@ npm install
 
 ---
 
-**最后更新**: 2026-04-03  
+**最后更新: 2026-04-09  
 **维护者**: Greenly 开发团队

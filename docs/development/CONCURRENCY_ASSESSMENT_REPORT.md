@@ -452,8 +452,8 @@ df -h                   # 磁盘空间
 iftop                   # 网络带宽
 
 # 应用监控
-curl http://localhost:8085/actuator/health
-curl http://localhost:8085/actuator/metrics
+curl http://localhost:9090/actuator/health
+curl http://localhost:9090/actuator/metrics
 
 # 数据库监控
 mysql -e "SHOW STATUS LIKE 'Threads_connected';"
@@ -506,5 +506,5 @@ mysql -e "SHOW PROCESSLIST;"
 
 **🎉 Greenly 项目已具备生产级别的多用户并发能力！**
 
-*报告生成时间: 2026-04-06*  
+*报告生成时间: 2026-04-09*  
 *下次评估建议: 用户量达到 100+ 时重新评估*

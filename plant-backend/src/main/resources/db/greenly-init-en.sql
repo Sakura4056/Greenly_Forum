@@ -356,7 +356,7 @@ CREATE TABLE `forum_like` (
 
 -- ----------------------------
 -- 数据 1: 系统用户（4 个默认用户）
--- 密码: admin123 / user123 (BCrypt 加密哈希)
+-- 密码: admin123 (所有用户共用) (BCrypt 加密哈希)
 -- ----------------------------
 INSERT INTO `sys_user` (`user_id`, `username`, `password`, `nickname`, `email`, `phone`, `role`, `status`, `gender`, `signature`) VALUES
 (1, 'admin', '$2a$10$D0WC2cOO9qc3.aQOW4ek5OusEkpvTGCHQTBDE1.ghcje5NzhJEXlO', '系统管理员', 'admin@greenly.com', '13800138000', 'ADMIN', 1, 1, 'Greenly 系统管理员'),
