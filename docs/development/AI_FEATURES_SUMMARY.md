@@ -8,7 +8,6 @@
 - `plant-backend/src/main/java/com/plant/backend/service/BaiduAiService.java`
   - 封装百度AI图像识别服务
   - 支持植物识别（plantDetect）
-  - 支持通用物体识别用于病虫害诊断（advancedGeneral）
   - 自动处理URL和Base64格式的图片
   - 提供降级策略（未配置时返回模拟数据）
 
@@ -101,12 +100,7 @@ BaiduAiService.identifyPlant() 或 diagnoseDisease()
 - 返回植物名称和置信度
 - 提供基础养护建议
 
-### 2. 病虫害诊断 (disease)
-- 使用通用物体识别检测异常
-- 描述可能的问题
-- 提供治疗建议
-
-### 3. 养护建议 (care)
+### 2. 养护建议 (care)
 - 先识别植物种类
 - 生成针对性的养护方案
 - 包含浇水、光照、温度、施肥等建议

@@ -28,7 +28,7 @@
 |------|------|
 | [技术栈](development/TECH_STACK.md) | Spring Boot 3.3 / Vue 3 / MySQL 8 / Redis |
 | [代码规范](development/CODING_STANDARDS.md) | Java / Vue / SQL / Git 提交规范 |
-| [AI 功能](development/AI_FEATURES_SUMMARY.md) | 百度 AI 植物识别与病虫害诊断 |
+| [AI 功能](development/AI_FEATURES_SUMMARY.md) | 百度 AI 植物识别 |
 | [并发评估](development/CONCURRENCY_ASSESSMENT_REPORT.md) | 多用户并发能力分析 |
 | [生产配置优化](development/PRODUCTION_CONFIG_OPTIMIZATION.md) | JVM / HikariCP / Nginx 调优 |
 | [SDK vs HTTP](development/SDK_VS_HTTP_COMPARISON.md) | 百度 AI 接入方案对比 |

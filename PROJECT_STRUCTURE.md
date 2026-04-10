@@ -59,7 +59,6 @@ Greenly/
 │   ├── PlantController          # 官方植物库
 │   ├── PlantDiaryController     # 养护日记
 │   ├── ReminderController       # 提醒
-│   ├── SmartWateringController  # 智能浇水
 │   ├── TestController           # 测试接口
 │   └── UserController           # 用户
 ├── dto/                 # 数据传输对象 (13)
@@ -102,7 +101,7 @@ Greenly/
 | `diary/` | 养护日记 | 日记列表 + 详情 |
 | `photo/` | 照片管理 | 上传 + 浏览 |
 | `forum/` | 论坛 | 帖子列表 + 详情 + 发布 |
-| `ai/` | AI 诊断 | 植物识别 + 病虫害诊断 |
+| `ai/` | AI 诊断 | 植物识别 |
 | `identification/` | 植物识别 | 图像识别 |
 | `reminder/` | 提醒设置 | 提醒配置 |
 | `user/` | 个人中心 | 资料编辑 |
