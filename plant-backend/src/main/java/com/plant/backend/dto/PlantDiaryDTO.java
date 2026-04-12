@@ -1,6 +1,7 @@
 package com.plant.backend.dto;
 
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
 public class PlantDiaryDTO {
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class CreateRequest {
         private Long plantId;
         private String title;
@@ -41,6 +43,7 @@ public class PlantDiaryDTO {
         private String mood;
         private String weather;
         private List<Long> photoIds;
+        private List<String> photoUrls;
         private String diaryDate;
         private String createTime;
     }

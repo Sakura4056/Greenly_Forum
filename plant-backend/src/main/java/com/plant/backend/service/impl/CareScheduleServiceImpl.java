@@ -13,11 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 @Service
@@ -134,30 +129,4 @@ public class CareScheduleServiceImpl extends com.baomidou.mybatisplus.extension.
         return careScheduleMapper.selectPage(page, wrapper);
     }
 
-    @Override
-    public Map<String, List<CareSchedule>> getCalendar(Integer year, Integer month, Long userId) {
-        // 注意：逾期标记已移至定时任务，此处直接查询
-        
-        // 计算当月的开始和结束时间
-        LocalDateTime startOfMonth = LocalDateTime.of(year, month, 1, 0, 0, 0);
-        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusSeconds(1);
-        
-        // 查询当月的所有计划
-        LambdaQueryWrapper<CareSchedule> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(CareSchedule::getUserId, userId)
-                .between(CareSchedule::getDueTime, startOfMonth, endOfMonth);
-        
-        List<CareSchedule> schedules = careScheduleMapper.selectList(wrapper);
-        
-        // 按日期分组
-        Map<String, List<CareSchedule>> calendarMap = new HashMap<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        
-        for (CareSchedule schedule : schedules) {
-            String dateStr = schedule.getDueTime().format(formatter);
-            calendarMap.computeIfAbsent(dateStr, k -> new ArrayList<>()).add(schedule);
-        }
-        
-        return calendarMap;
     }
-}

@@ -223,30 +223,6 @@ class CareScheduleServiceTest {
         assertTrue(result.getTotal() >= 1);
     }
 
-    @Test
-    @DisplayName("测试获取日历视图 - 按月分组")
-    void testGetCalendar_Success() {
-        // Given
-        LocalDateTime now = LocalDateTime.now();
-        for (int i = 0; i < 5; i++) {
-            CareScheduleDTO.AddRequest request = new CareScheduleDTO.AddRequest();
-            request.setUserId(testUserId);
-            request.setPlantId(testPlantId);
-            request.setPlantSource("official");
-            request.setTaskName("日历任务" + i);
-            request.setDueTime(now.withDayOfMonth(Math.min(i + 1, 28)));
-            request.setRecurrenceType("none");
-            careScheduleService.add(request);
-        }
-
-        // When
-        Map<String, List<CareSchedule>> calendar = careScheduleService.getCalendar(
-                now.getYear(), now.getMonthValue(), testUserId);
-
-        // Then
-        assertNotNull(calendar);
-        assertFalse(calendar.isEmpty());
-    }
 
     @Test
     @DisplayName("测试逾期标记逻辑")

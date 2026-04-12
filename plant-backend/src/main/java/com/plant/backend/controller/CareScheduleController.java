@@ -94,20 +94,4 @@ public class CareScheduleController extends BaseController {
         return success(careScheduleService.query(query, userId, role));
     }
 
-    @GetMapping("/calendar")
-    public Result<Map<String, List<CareSchedule>>> getCalendar(@RequestParam Integer year, @RequestParam Integer month, HttpServletRequest httpRequest) {
-        String token = extractToken(httpRequest);
-        if (token == null) {
-            log.warn("未提供有效的认证令牌");
-            return error(401, "未登录或登录已过期");
-        }
-        Long userId = jwtUtil.getUserIdFromToken(token);
-        if (userId == null) {
-            log.warn("无效的认证令牌");
-            return error(401, "认证失败");
-        }
-
-        Map<String, List<CareSchedule>> calendar = careScheduleService.getCalendar(year, month, userId);
-        return success(calendar);
-    }
 }

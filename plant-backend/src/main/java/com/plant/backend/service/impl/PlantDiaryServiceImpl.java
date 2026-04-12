@@ -10,6 +10,7 @@ import com.plant.backend.entity.PlantDiary;
 import com.plant.backend.exception.BusinessException;
 import com.plant.backend.mapper.MyPlantMapper;
 import com.plant.backend.mapper.PlantDiaryMapper;
+import com.plant.backend.mapper.PlantPhotoMapper;
 import com.plant.backend.service.PlantDiaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 public class PlantDiaryServiceImpl implements PlantDiaryService {
 
     private final PlantDiaryMapper plantDiaryMapper;
+    private final PlantPhotoMapper plantPhotoMapper;
     private final MyPlantMapper myPlantMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -245,17 +247,29 @@ public class PlantDiaryServiceImpl implements PlantDiaryService {
             response.setPlantNickname(plant.getNickname());
         }
 
-        // Parse photo IDs
+        // Parse photo IDs and resolve URLs
         if (diary.getPhotos() != null && !diary.getPhotos().isEmpty()) {
             try {
                 List<Long> photoIds = objectMapper.readValue(diary.getPhotos(), new TypeReference<List<Long>>() {});
                 response.setPhotoIds(photoIds);
+                
+                // Resolve photo URLs from database
+                List<String> photoUrls = new ArrayList<>();
+                for (Long photoId : photoIds) {
+                    com.plant.backend.entity.PlantPhoto photo = plantPhotoMapper.selectById(photoId);
+                    if (photo != null && photo.getUrl() != null) {
+                        photoUrls.add(photo.getUrl());
+                    }
+                }
+                response.setPhotoUrls(photoUrls);
             } catch (Exception e) {
                 log.error("Error deserializing photo IDs: {}", e.getMessage());
                 response.setPhotoIds(new ArrayList<>());
+                response.setPhotoUrls(new ArrayList<>());
             }
         } else {
             response.setPhotoIds(new ArrayList<>());
+            response.setPhotoUrls(new ArrayList<>());
         }
 
         return response;
