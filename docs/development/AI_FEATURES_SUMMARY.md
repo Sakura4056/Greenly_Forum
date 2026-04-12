@@ -100,7 +100,7 @@ BaiduAiService.identifyPlant() 或 diagnoseDisease()
 - 返回植物名称和置信度
 - 提供基础养护建议
 
-### 2. 养护建议 (care)
+### 3. 养护建议 (care)
 - 先识别植物种类
 - 生成针对性的养护方案
 - 包含浇水、光照、温度、施肥等建议

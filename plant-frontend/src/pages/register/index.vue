@@ -21,7 +21,7 @@
           <el-form-item label="用户名" prop="username">
             <el-input
               v-model="registerForm.username"
-              placeholder="2-20 位字符，支持中文、字母和数字"
+              placeholder="2-20 位字符，仅支持字母和数字"
               :prefix-icon="User"
               clearable
               maxlength="20"
@@ -165,8 +165,8 @@ const rules = {
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 2, max: 20, message: '用户名长度在 2-20 个字符之间', trigger: 'blur' },
     {
-      pattern: /^[a-zA-Z0-9\u4e00-\u9fa5]{2,20}$/,
-      message: '用户名只能包含中文、字母和数字',
+      pattern: /^[a-zA-Z0-9]{2,20}$/,
+      message: '用户名只能包含字母和数字',
       trigger: 'blur'
     }
   ],

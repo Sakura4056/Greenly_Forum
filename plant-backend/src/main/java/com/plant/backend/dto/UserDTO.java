@@ -27,7 +27,7 @@ public class UserDTO {
         
         @Schema(description = "用户名", example = "zhangsan", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "用户名不能为空")
-        @Pattern(regexp = "^[a-zA-Z0-9\\u4e00-\\u9fa5]{2,20}$", message = "用户名长度需在 2-20 位之间，支持中文、字母和数字")
+        @Pattern(regexp = "^[a-zA-Z0-9]{2,20}$", message = "用户名长度需在 2-20 位之间，仅支持字母和数字")
         private String username;
 
         @Schema(description = "密码", example = "123456", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -43,7 +43,7 @@ public class UserDTO {
         private String email;
 
         @Schema(description = "手机号", example = "13800138000")
-        @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
+        @Pattern(regexp = "^$|^1[3-9]\\d{9}$", message = "手机号格式不正确")
         private String phone;
     }
 
@@ -107,7 +107,7 @@ public class UserDTO {
         private String email;
 
         @Schema(description = "手机号", example = "13800138000")
-        @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
+        @Pattern(regexp = "^$|^1[3-9]\\d{9}$", message = "手机号格式不正确")
         private String phone;
 
         @Schema(description = "性别", example = "1", allowableValues = {"0", "1", "2"})
