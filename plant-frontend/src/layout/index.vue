@@ -40,68 +40,7 @@
           </div>
           <div class="header-right">
             <!-- 智能浇水提醒 -->
-            <WateringNotification />
             
-            <!-- 通知中心 -->
-            <div 
-              class="notification-icon" 
-              @click="showNotificationMenu = !showNotificationMenu"
-              @keydown.enter="showNotificationMenu = !showNotificationMenu"
-              @keydown.space="showNotificationMenu = !showNotificationMenu"
-              @keydown.esc="showNotificationMenu = false"
-              role="button"
-              tabindex="0"
-              aria-haspopup="true"
-              aria-expanded="showNotificationMenu"
-              aria-label="通知中心"
-            >
-              <el-badge :value="unreadCount" :hidden="unreadCount === 0" class="notification-badge">
-                <el-icon class="bell-icon"><Bell /></el-icon>
-              </el-badge>
-              <div 
-                v-if="showNotificationMenu" 
-                class="notification-dropdown"
-                role="menu"
-                aria-label="通知列表"
-              >
-                <div class="dropdown-header">
-                  <span>通知中心</span>
-                  <el-button 
-                    link 
-                    size="small" 
-                    @click="markAllAsRead"
-                    v-if="unreadCount > 0"
-                  >
-                    全部已读
-                  </el-button>
-                </div>
-                <div class="notification-list">
-                  <div v-if="notifications.length === 0" class="empty-notifications">
-                    <el-empty description="暂无通知" :image-size="60" />
-                  </div>
-                  <div 
-                    v-for="(notification, index) in notifications" 
-                    :key="index"
-                    class="notification-item"
-                    :class="{ 'unread': !notification.read }"
-                  >
-                    <el-icon class="notification-type-icon">
-                      <component :is="notification.icon" />
-                    </el-icon>
-                    <div class="notification-content">
-                      <div class="notification-title">{{ notification.title }}</div>
-                      <div class="notification-time">{{ notification.time }}</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="dropdown-footer">
-                  <el-button link @click="goToNotifications">
-                    查看全部
-                  </el-button>
-                </div>
-              </div>
-            </div>
-
             <!-- 用户菜单 -->
             <div 
               class="user-profile" 
@@ -165,11 +104,10 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import Sidebar from './components/Sidebar.vue'
-import WateringNotification from '@/components/business/WateringNotification.vue'
+
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
-import { Bell, ArrowDown, User, SwitchButton, Timer, Warning, Message } from '@element-plus/icons-vue'
-import { getUnreadCount, getUnread, markAllAsRead as apiMarkAllAsRead } from '@/api/reminder'
+import { ArrowDown, User, SwitchButton } from '@element-plus/icons-vue'
 
 const userStore = useUserStore()
 const router = useRouter()
@@ -177,9 +115,6 @@ const isSidebarCollapsed = ref(false)
 const showUserMenu = ref(false)
 const isMobile = ref(false)
 const showMobileSidebar = ref(false)
-const showNotificationMenu = ref(false)
-const unreadCount = ref(0)
-const notifications = ref([])
 
 const handleLogout = () => {
   userStore.logout()
@@ -205,73 +140,9 @@ const checkMobile = () => {
     showMobileSidebar.value = false
   }
 }
-
-// 加载未读消息数
-const loadUnreadCount = async () => {
-  try {
-    const res = await getUnreadCount()
-    if (res.data) {
-      unreadCount.value = res.data
-    }
-  } catch (err) {
-    console.error('加载未读消息数失败', err)
-  }
-}
-
-// 加载通知列表
-const loadNotifications = async () => {
-  try {
-    const res = await getUnread(userStore.userId)
-    if (res.data) {
-      // 转换通知格式
-      const allNotifications = []
-      Object.entries(res.data.details).forEach(([key, items]) => {
-        items.forEach(item => {
-          allNotifications.push({
-            id: item.id,
-            title: item.content,
-            time: new Date(item.createTime).toLocaleString(),
-            read: item.isRead === 1,
-            icon: key === 'careSchedule' ? Timer : key === 'plantAudit' ? Warning : key === 'announcement' ? Message : Message
-          })
-        })
-      })
-      // 按时间排序，最新的在前面
-      allNotifications.sort((a, b) => new Date(b.time) - new Date(a.time))
-      // 只显示最近10条
-      notifications.value = allNotifications.slice(0, 10)
-    }
-  } catch (err) {
-    console.error('加载通知列表失败', err)
-  }
-}
-
-// 标记所有通知为已读
-const markAllAsRead = async () => {
-  try {
-    await apiMarkAllAsRead()
-    unreadCount.value = 0
-    notifications.value = notifications.value.map(notification => ({
-      ...notification,
-      read: true
-    }))
-  } catch (err) {
-    console.error('标记全部已读失败', err)
-  }
-}
-
-// 跳转到通知页面
-const goToNotifications = () => {
-  router.push('/reminder/unread')
-  showNotificationMenu.value = false
-}
-
 onMounted(() => {
   checkMobile()
   window.addEventListener('resize', checkMobile)
-  // 加载未读消息数和通知列表
-  loadUnreadCount()
-  loadNotifications()
 })
 
 onUnmounted(() => {
@@ -392,110 +263,6 @@ onUnmounted(() => {
   align-items: center;
   gap: var(--spacing-md);
   
-  /* 通知中心 */
-  .notification-icon {
-    position: relative;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: all var(--transition-fast);
-    
-    &:hover {
-      background: rgba(0,0,0,0.06);
-    }
-    
-    .bell-icon {
-      font-size: 20px;
-      color: var(--color-text-main);
-    }
-    
-    .notification-badge {
-      --el-badge-font-size: 10px;
-      --el-badge-height: 16px;
-      --el-badge-min-width: 16px;
-    }
-    
-    .notification-dropdown {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      margin-top: 8px;
-      background: var(--color-surface);
-      border-radius: var(--border-radius-base);
-      box-shadow: var(--shadow-lg);
-      min-width: 320px;
-      max-width: 400px;
-      max-height: 400px;
-      z-index: var(--z-index-dropdown);
-      animation: dropdown-fade-in 0.2s ease-out;
-      
-      .dropdown-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 16px;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-        font-weight: 600;
-        color: var(--color-text-main);
-      }
-      
-      .notification-list {
-        max-height: 300px;
-        overflow-y: auto;
-        
-        .empty-notifications {
-          padding: 40px 20px;
-          text-align: center;
-        }
-        
-        .notification-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 12px;
-          padding: 12px 16px;
-          transition: all var(--transition-fast);
-          cursor: pointer;
-          
-          &:hover {
-            background-color: var(--color-background);
-          }
-          
-          &.unread {
-            background-color: rgba(var(--el-color-primary-rgb), 0.05);
-          }
-          
-          .notification-type-icon {
-            font-size: 16px;
-            color: var(--color-primary);
-            margin-top: 2px;
-          }
-          
-          .notification-content {
-            flex: 1;
-            
-            .notification-title {
-              font-size: 14px;
-              color: var(--color-text-main);
-              margin-bottom: 4px;
-              line-height: 1.4;
-            }
-            
-            .notification-time {
-              font-size: 12px;
-              color: var(--color-text-secondary);
-            }
-          }
-        }
-      }
-      
-      .dropdown-footer {
-        padding: 12px 16px;
-        border-top: 1px solid rgba(0,0,0,0.05);
-        text-align: center;
-      }
-    }
-  }
-
   /* 用户菜单 */
   .user-profile {
     display: flex;

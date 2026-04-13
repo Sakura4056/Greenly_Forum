@@ -234,4 +234,35 @@ public class UserDTO {
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime createTime;
     }
+
+    /**
+     * 发送验证码请求 DTO
+     */
+    @Data
+    @Schema(description = "发送验证码请求")
+    public static class SendCodeRequest {
+        
+        @Schema(description = "邮箱地址", example = "zhangsan@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "邮箱不能为空")
+        @Email(message = "邮箱格式不正确")
+        private String email;
+    }
+
+    /**
+     * 绑定邮箱请求 DTO
+     */
+    @Data
+    @Schema(description = "绑定邮箱请求")
+    public static class BindEmailRequest {
+        
+        @Schema(description = "邮箱地址", example = "zhangsan@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "邮箱不能为空")
+        @Email(message = "邮箱格式不正确")
+        private String email;
+
+        @Schema(description = "验证码", example = "123456", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "验证码不能为空")
+        @Pattern(regexp = "^\\d{6}$", message = "验证码为 6 位数字")
+        private String code;
+    }
 }

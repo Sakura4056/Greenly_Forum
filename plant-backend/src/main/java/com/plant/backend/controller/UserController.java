@@ -4,7 +4,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.plant.backend.base.BaseController;
 import com.plant.backend.dto.UserDTO;
 import com.plant.backend.entity.User;
+import com.plant.backend.exception.BusinessException;
+import com.plant.backend.service.EmailVerificationService;
 import com.plant.backend.service.UserService;
+import com.plant.backend.util.ResultCode;
 import com.plant.backend.util.IpUtils;
 import com.plant.backend.util.JwtUtil;
 import com.plant.backend.util.Result;
@@ -34,6 +37,7 @@ public class UserController extends BaseController {
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final EmailVerificationService emailVerificationService;
 
     /**
      * 用户注册
@@ -65,6 +69,37 @@ public class UserController extends BaseController {
         logOperation("USER_LOGIN", "用户登录成功，username=" + request.getUsername() + ", ip=" + ip);
         return success(response);
     }
+
+    // ==================== 邮箱绑定 ====================
+
+    @Operation(summary = "发送邮箱绑定验证码", description = "向邮箱发送绑定验证码（需登录）")
+    @PostMapping("/send-bind-email-code")
+    public Result<Void> sendBindEmailCode(@RequestBody @Valid UserDTO.SendCodeRequest request,
+                                          HttpServletRequest httpRequest) {
+        String token = extractToken(httpRequest);
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        log.info("发送邮箱绑定验证码，userId: {}, email: {}", userId, request.getEmail());
+
+        if (userService.isEmailRegistered(request.getEmail())) {
+            throw new BusinessException(ResultCode.PARAM_ERROR.getCode(), "该邮箱已被绑定");
+        }
+
+        emailVerificationService.sendBindEmailCode(request.getEmail());
+        return success();
+    }
+
+    @Operation(summary = "绑定邮箱", description = "通过验证码绑定邮箱（需登录）")
+    @PostMapping("/bind-email")
+    public Result<Void> bindEmail(@RequestBody @Valid UserDTO.BindEmailRequest request,
+                                  HttpServletRequest httpRequest) {
+        String token = extractToken(httpRequest);
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        log.info("绑定邮箱请求，userId: {}, email: {}", userId, request.getEmail());
+        userService.bindEmail(userId, request);
+        return success();
+    }
+
+    // ==================== 用户信息 ====================
 
     /**
      * 获取当前登录用户信息

@@ -4,7 +4,7 @@
       <template #header>
         <div class="card-header">
           <h2>植物日记</h2>
-          <el-button type="primary" @click="openCreateDialog">
+          <el-button type="primary" @click="showCreateDialog = true">
             <el-icon><Plus /></el-icon>
             写日记
           </el-button>
@@ -43,7 +43,7 @@
         <el-empty v-if="!loading && diaries.length === 0" description="还没有日记，开始记录吧！" />
 
         <div v-for="diary in diaries" :key="diary.id" class="diary-card">
-          <el-card shadow="hover" @click="viewDetail(diary)">
+          <el-card shadow="hover">
             <div class="diary-header">
               <div class="diary-title">
                 <h3>{{ diary.title || '无标题' }}</h3>
@@ -51,38 +51,21 @@
                   {{ getMoodEmoji(diary.mood) }} {{ getMoodText(diary.mood) }}
                 </el-tag>
                 <el-tag v-if="diary.weather" type="info" size="small" style="margin-left: 8px">
-                  {{ getWeatherEmoji(diary.weather) }} {{ getWeatherText(diary.weather) }}
+                  {{ getWeatherEmoji(diary.weather) }} {{ diary.weather }}
                 </el-tag>
               </div>
               <div class="diary-meta">
-                <span class="plant-name">🌱 {{ diary.plantNickname }}</span>
-                <span class="date">📅 {{ diary.diaryDate }}</span>
+                <span class="plant-name">{{ diary.plantNickname }}</span>
+                <span class="date">{{ diary.diaryDate }}</span>
               </div>
             </div>
 
-            <!-- Photo thumbnails -->
-            <div v-if="diary.photoUrls && diary.photoUrls.length > 0" class="diary-photos">
-              <el-image
-                v-for="(url, idx) in diary.photoUrls.slice(0, 3)"
-                :key="idx"
-                :src="url"
-                fit="cover"
-                class="diary-thumb"
-                :preview-src-list="diary.photoUrls"
-                :initial-index="idx"
-                @click.stop
-              />
-              <span v-if="diary.photoUrls.length > 3" class="photo-more">
-                +{{ diary.photoUrls.length - 3 }}
-              </span>
-            </div>
-
             <div class="diary-content">
-              <p>{{ truncateContent(diary.content, 150) }}</p>
+              <p>{{ truncateContent(diary.content, 200) }}</p>
             </div>
 
-            <div class="diary-footer" @click.stop>
-              <el-button type="primary" link @click="viewDetail(diary)">查看详情</el-button>
+            <div class="diary-footer">
+              <el-button type="primary" link @click="viewDetail(diary.id)">查看详情</el-button>
               <el-button type="warning" link @click="editDiary(diary)">编辑</el-button>
               <el-button type="danger" link @click="confirmDelete(diary.id)">删除</el-button>
             </div>
@@ -102,54 +85,11 @@
       />
     </el-card>
 
-    <!-- Detail Dialog -->
-    <el-dialog
-      v-model="showDetailDialog"
-      :title="detailDiary?.title || '日记详情'"
-      width="700px"
-      class="diary-detail-dialog"
-    >
-      <div v-if="detailDiary" class="diary-detail">
-        <div class="detail-meta">
-          <span class="meta-item">🌱 {{ detailDiary.plantNickname }}</span>
-          <span class="meta-item">📅 {{ detailDiary.diaryDate }}</span>
-          <el-tag :type="getMoodTagType(detailDiary.mood)" size="small">
-            {{ getMoodEmoji(detailDiary.mood) }} {{ getMoodText(detailDiary.mood) }}
-          </el-tag>
-          <el-tag v-if="detailDiary.weather" type="info" size="small" style="margin-left: 8px">
-            {{ getWeatherEmoji(detailDiary.weather) }} {{ getWeatherText(detailDiary.weather) }}
-          </el-tag>
-        </div>
-
-        <!-- Photos -->
-        <div v-if="detailDiary.photoUrls && detailDiary.photoUrls.length > 0" class="detail-photos">
-          <el-image
-            v-for="(url, idx) in detailDiary.photoUrls"
-            :key="idx"
-            :src="url"
-            fit="cover"
-            class="detail-photo"
-            :preview-src-list="detailDiary.photoUrls"
-            :initial-index="idx"
-          />
-        </div>
-
-        <div class="detail-content">
-          <p>{{ detailDiary.content }}</p>
-        </div>
-
-        <div class="detail-time">
-          创建于 {{ detailDiary.createTime }}
-        </div>
-      </div>
-    </el-dialog>
-
     <!-- Create/Edit Dialog -->
     <el-dialog
       v-model="showCreateDialog"
       :title="editingDiary ? '编辑日记' : '写日记'"
       width="700px"
-      @closed="resetForm"
     >
       <el-form :model="diaryForm" label-width="80px">
         <el-form-item label="植物" required>
@@ -172,23 +112,6 @@
             :rows="6"
             placeholder="记录今天的植物养护心得..."
           />
-        </el-form-item>
-        <el-form-item label="照片">
-          <div class="upload-area">
-            <el-upload
-              v-model:file-list="diaryForm.fileList"
-              :http-request="customUpload"
-              list-type="picture-card"
-              :on-success="onUploadSuccess"
-              :on-remove="onUploadRemove"
-              :on-preview="onPreview"
-              accept="image/*"
-              :limit="9"
-              :on-exceed="() => ElMessage.warning('最多上传9张照片')"
-            >
-              <el-icon><Plus /></el-icon>
-            </el-upload>
-          </div>
         </el-form-item>
         <el-form-item label="心情">
           <el-radio-group v-model="diaryForm.mood">
@@ -224,11 +147,6 @@
         </el-button>
       </template>
     </el-dialog>
-
-    <!-- Image Preview Dialog -->
-    <el-dialog v-model="showPreview" width="800px" :show-close="true">
-      <img :src="previewUrl" style="width: 100%" />
-    </el-dialog>
   </div>
 </template>
 
@@ -242,11 +160,7 @@ import { getMyPlantList } from '@/api/my-plant'
 const loading = ref(false)
 const submitting = ref(false)
 const showCreateDialog = ref(false)
-const showDetailDialog = ref(false)
-const showPreview = ref(false)
-const previewUrl = ref('')
 const editingDiary = ref(null)
-const detailDiary = ref(null)
 const diaries = ref([])
 const plants = ref([])
 const total = ref(0)
@@ -268,56 +182,8 @@ const diaryForm = reactive({
   content: '',
   mood: 'neutral',
   weather: '',
-  diaryDate: new Date(),
-  fileList: [],
-  photoIds: []
+  diaryDate: new Date()
 })
-
-import request from '@/api/request'
-
-// Custom upload handler - includes plantSource param
-const customUpload = async (options) => {
-  const { file, onSuccess, onError } = options
-  const formData = new FormData()
-  formData.append('file', file)
-  formData.append('plantSource', 'LOCAL')
-  formData.append('isPublic', '0')
-  if (diaryForm.plantId) {
-    formData.append('plantId', diaryForm.plantId)
-  }
-  try {
-    const res = await request({
-      url: '/photo/upload',
-      method: 'post',
-      data: formData,
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-    onSuccess(res)
-  } catch (err) {
-    onError(err)
-  }
-}
-
-// Upload handlers
-const onUploadSuccess = (response) => {
-  const data = response?.data || response
-  if (data && data.id) {
-    diaryForm.photoIds.push(data.id)
-  }
-}
-
-const onUploadRemove = (file) => {
-  const data = file.response?.data || file.response
-  if (data && data.id) {
-    const idx = diaryForm.photoIds.indexOf(data.id)
-    if (idx > -1) diaryForm.photoIds.splice(idx, 1)
-  }
-}
-
-const onPreview = (file) => {
-  previewUrl.value = file.url || file.response?.data?.url || file.response?.url
-  showPreview.value = true
-}
 
 // Fetch plants
 const fetchPlants = async () => {
@@ -357,35 +223,23 @@ const resetFilter = () => {
 }
 
 // View detail
-const viewDetail = (diary) => {
-  detailDiary.value = diary
-  showDetailDialog.value = true
-}
-
-// Open create dialog
-const openCreateDialog = () => {
-  editingDiary.value = null
-  resetForm()
-  showCreateDialog.value = true
+const viewDetail = (id) => {
+  // TODO: Navigate to detail page or show dialog
+  ElMessage.info('详情功能开发中')
 }
 
 // Edit diary
 const editDiary = (diary) => {
   editingDiary.value = diary
-  // Populate form
-  diaryForm.id = diary.id
-  diaryForm.plantId = diary.plantId
-  diaryForm.title = diary.title || ''
-  diaryForm.content = diary.content
-  diaryForm.mood = diary.mood || 'neutral'
-  diaryForm.weather = diary.weather || ''
-  diaryForm.diaryDate = new Date(diary.diaryDate)
-  diaryForm.photoIds = diary.photoIds ? [...diary.photoIds] : []
-  // Populate fileList from existing photos
-  diaryForm.fileList = (diary.photoUrls || []).map((url, idx) => ({
-    name: `photo_${idx}`,
-    url: url
-  }))
+  Object.assign(diaryForm, {
+    id: diary.id,
+    plantId: diary.plantId,
+    title: diary.title || '',
+    content: diary.content,
+    mood: diary.mood || 'neutral',
+    weather: diary.weather || '',
+    diaryDate: new Date(diary.diaryDate)
+  })
   showCreateDialog.value = true
 }
 
@@ -397,12 +251,21 @@ const confirmDelete = async (id) => {
       cancelButtonText: '取消',
       type: 'warning'
     })
-    await deleteDiary(id)
+    
+    console.log('开始删除日记，ID:', id)
+    const result = await deleteDiary(id)
+    console.log('删除响应:', result)
     ElMessage.success('删除成功')
     fetchDiaries()
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('删除失败')
+      console.error('删除日记失败:', error)
+      console.error('错误详情:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      })
+      ElMessage.error(error.message || error.msg || '删除失败，请重试')
     }
   }
 }
@@ -417,22 +280,20 @@ const submitDiary = async () => {
   submitting.value = true
   try {
     const data = {
-      plantId: diaryForm.plantId,
-      title: diaryForm.title,
-      content: diaryForm.content,
-      mood: diaryForm.mood,
-      weather: diaryForm.weather,
-      photoIds: diaryForm.photoIds,
+      ...diaryForm,
       diaryDate: diaryForm.diaryDate instanceof Date
         ? diaryForm.diaryDate.toISOString().split('T')[0]
         : diaryForm.diaryDate
     }
 
+    console.log('提交日记数据:', data)
+
     if (editingDiary.value) {
-      data.id = editingDiary.value.id
+      console.log('更新日记，ID:', data.id)
       await updateDiary(data)
       ElMessage.success('更新成功')
     } else {
+      console.log('创建新日记')
       await createDiary(data)
       ElMessage.success('创建成功')
     }
@@ -441,7 +302,20 @@ const submitDiary = async () => {
     resetForm()
     fetchDiaries()
   } catch (error) {
-    const errorMsg = error.response?.data?.msg || error.message || '操作失败'
+    console.error('提交日记失败:', error)
+    console.error('错误详情:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    })
+    
+    let errorMsg = editingDiary.value ? '更新失败' : '创建失败'
+    if (error.response?.data?.msg) {
+      errorMsg = error.response.data.msg
+    } else if (error.message) {
+      errorMsg = error.message
+    }
+    
     ElMessage.error(errorMsg)
   } finally {
     submitting.value = false
@@ -458,36 +332,53 @@ const resetForm = () => {
     content: '',
     mood: 'neutral',
     weather: '',
-    diaryDate: new Date(),
-    fileList: [],
-    photoIds: []
+    diaryDate: new Date()
   })
 }
 
 // Helper functions
 const getMoodTagType = (mood) => {
-  const types = { happy: 'success', excited: 'success', neutral: 'info', worried: 'warning', sad: 'danger' }
+  const types = {
+    happy: 'success',
+    excited: 'success',
+    neutral: 'info',
+    worried: 'warning',
+    sad: 'danger'
+  }
   return types[mood] || 'info'
 }
 
 const getMoodEmoji = (mood) => {
-  const emojis = { happy: '😊', excited: '🤩', neutral: '😐', worried: '😟', sad: '😢' }
+  const emojis = {
+    happy: '😊',
+    excited: '🤩',
+    neutral: '😐',
+    worried: '😟',
+    sad: '😢'
+  }
   return emojis[mood] || '😐'
 }
 
 const getMoodText = (mood) => {
-  const texts = { happy: '开心', excited: '兴奋', neutral: '平静', worried: '担心', sad: '难过' }
+  const texts = {
+    happy: '开心',
+    excited: '兴奋',
+    neutral: '平静',
+    worried: '担心',
+    sad: '难过'
+  }
   return texts[mood] || '平静'
 }
 
 const getWeatherEmoji = (weather) => {
-  const emojis = { sunny: '☀️', cloudy: '⛅', rainy: '🌧️', snowy: '❄️', windy: '💨' }
+  const emojis = {
+    sunny: '☀️',
+    cloudy: '⛅',
+    rainy: '🌧️',
+    snowy: '❄️',
+    windy: '💨'
+  }
   return emojis[weather] || ''
-}
-
-const getWeatherText = (weather) => {
-  const texts = { sunny: '晴天', cloudy: '多云', rainy: '雨天', snowy: '雪天', windy: '有风' }
-  return texts[weather] || ''
 }
 
 const truncateContent = (content, maxLength) => {
@@ -506,61 +397,65 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  h2 { margin: 0; font-size: 20px; }
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+  }
 }
 
-.filter-form { margin-bottom: 20px; }
+.filter-form {
+  margin-bottom: 20px;
+}
 
-.diary-list { min-height: 400px; }
+.diary-list {
+  min-height: 400px;
+}
 
 .diary-card {
   margin-bottom: 16px;
-  cursor: pointer;
-  &:last-child { margin-bottom: 0; }
-  :deep(.el-card__body) { transition: background-color 0.2s; }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
-.diary-header { margin-bottom: 12px; }
+.diary-header {
+  margin-bottom: 12px;
+}
 
 .diary-title {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 8px;
-  h3 { margin: 0; font-size: 16px; flex: 1; }
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    flex: 1;
+  }
 }
 
 .diary-meta {
   display: flex;
-  gap: 16px;
+  justify-content: space-between;
   font-size: 13px;
   color: var(--el-text-color-secondary);
-}
 
-.diary-photos {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.diary-thumb {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.photo-more {
-  font-size: 14px;
-  color: var(--el-text-color-secondary);
-  padding: 0 8px;
+  .plant-name {
+    font-weight: 500;
+  }
 }
 
 .diary-content {
   margin: 12px 0;
-  p { margin: 0; line-height: 1.6; color: var(--el-text-color-regular); }
+
+  p {
+    margin: 0;
+    line-height: 1.6;
+    color: var(--el-text-color-regular);
+  }
 }
 
 .diary-footer {
@@ -568,63 +463,5 @@ onMounted(() => {
   gap: 12px;
   padding-top: 12px;
   border-top: 1px solid var(--el-border-color-lighter);
-}
-
-/* Detail Dialog */
-.diary-detail {
-  padding: 8px 0;
-}
-
-.detail-meta {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-  .meta-item { font-size: 14px; color: var(--el-text-color-secondary); }
-}
-
-.detail-photos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.detail-photo {
-  width: 150px;
-  height: 150px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.detail-content {
-  margin-bottom: 16px;
-  p {
-    margin: 0;
-    line-height: 1.8;
-    font-size: 15px;
-    color: var(--el-text-color-regular);
-    white-space: pre-wrap;
-  }
-}
-
-.detail-time {
-  font-size: 12px;
-  color: var(--el-text-color-placeholder);
-  text-align: right;
-}
-
-/* Upload Area */
-.upload-area {
-  :deep(.el-upload--picture-card) {
-    width: 100px;
-    height: 100px;
-    line-height: 108px;
-  }
-  :deep(.el-upload-list--picture-card .el-upload-list__item) {
-    width: 100px;
-    height: 100px;
-  }
 }
 </style>

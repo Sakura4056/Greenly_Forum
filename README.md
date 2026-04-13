@@ -23,7 +23,6 @@
 - **养护计划** — 为植物制定浇水、施肥、换盆等周期计划
 - **养护记录** — 记录每次养护操作（完成、跳过、备注）
 - **养护统计** — 可视化展示养护频率、完成率等数据
-- **养护日历** — 按日历视图查看待办养护任务
 
 ### 💬 社区论坛
 - **帖子发布** — 支持图文帖，按分类浏览
@@ -42,6 +41,7 @@
 ### 👤 用户系统
 - 注册 / 登录（JWT 认证）
 - 个人资料编辑（头像、昵称、签名）
+- 邮箱绑定（需邮箱验证码）
 - 角色权限（普通用户 / 管理员）
 - 管理员后台（用户管理、公告管理）
 
@@ -140,24 +140,27 @@ Greenly/
 ## 文档
 
 ### 入门
-- [数据库快速参考](docs/guides/DATABASE_QUICK_REFERENCE.md) ⭐
 - [快速启动指南](QUICK_START.md)
+- [项目结构说明](PROJECT_STRUCTURE.md)
 - [常见问题与故障排查](docs/troubleshooting/common-issues.md)
 
 ### 部署
-- [云服务器部署指南](docs/guides/CLOUD_DEPLOYMENT_GUIDE.md) ⭐
+- [云服务器部署指南](docs/guides/CLOUD_DEPLOYMENT_GUIDE.md)
 - [部署速查卡](docs/guides/CLOUD_DEPLOYMENT_QUICK_REF.md)
 - [数据库备份与恢复](docs/guides/DATABASE_BACKUP_GUIDE.md)
+- [数据库快速参考](docs/guides/DATABASE_QUICK_REFERENCE.md)
 - [Redis 配置](docs/guides/REDIS_SETUP_GUIDE.md)
 - [百度 AI 配置](docs/guides/BAIDU_AI_SETUP.md)
 
 ### 开发
 - [技术栈说明](docs/development/TECH_STACK.md)
 - [代码规范](docs/development/CODING_STANDARDS.md)
-- [AI 功能实现](docs/development/AI_FEATURES_SUMMARY.md)
 - [并发能力评估](docs/development/CONCURRENCY_ASSESSMENT_REPORT.md)
 - [生产环境配置优化](docs/development/PRODUCTION_CONFIG_OPTIMIZATION.md)
 - [用户模块指南](docs/modules/USER_MODULE_GUIDE.md)
+
+### 环境配置
+- [后端环境变量](plant-backend/ENV_SETUP.md)
 
 ---
 
@@ -180,4 +183,3 @@ Greenly/
 ---
 
 _让植物养护变得更简单 🌱_
-

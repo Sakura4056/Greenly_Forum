@@ -20,23 +20,58 @@
         </el-form-item>
       </el-form>
 
-      <el-table v-loading="loading" :data="plantList" border style="width: 100%">
-        <el-table-column prop="name" label="名称" width="180" />
-        <el-table-column prop="genus" label="属" width="120" />
-        <el-table-column prop="species" label="种" width="120" />
-        <el-table-column label="操作" width="100">
-             <template #default="scope">
-                 <el-button link type="primary" @click="handleDetail(scope.row)">详情</el-button>
-             </template>
-        </el-table-column>
-      </el-table>
+      <div v-loading="loading" class="plant-grid">
+        <el-card 
+          v-for="plant in plantList" 
+          :key="plant.id" 
+          class="plant-card" 
+          shadow="hover"
+          @click="handleDetail(plant)"
+        >
+          <div class="plant-card-content">
+            <div class="plant-image-wrapper">
+              <el-image
+                v-if="plant.imageUrl"
+                :src="plant.imageUrl"
+                fit="cover"
+                class="plant-thumb"
+              >
+                <template #error>
+                  <div class="image-placeholder">
+                    <el-icon size="32"><Picture /></el-icon>
+                  </div>
+                </template>
+              </el-image>
+              <div v-else class="image-placeholder">
+                <el-icon size="32"><Picture /></el-icon>
+              </div>
+            </div>
+            <div class="plant-info">
+              <h3 class="plant-name">{{ plant.name }}</h3>
+              <p class="plant-taxonomy">{{ plant.genus }} · {{ plant.species }}</p>
+              <el-tag 
+                v-if="plant.difficulty" 
+                :type="getDifficultyType(plant.difficulty)" 
+                size="small"
+                effect="plain"
+              >
+                {{ plant.difficulty }}
+              </el-tag>
+            </div>
+          </div>
+        </el-card>
+      </div>
+
+      <div v-if="!loading && plantList.length === 0" class="empty-state">
+        <el-empty description="暂无植物数据" />
+      </div>
 
       <div class="pagination-container">
         <el-pagination
           v-if="total > 0"
           v-model:current-page="queryParams.pageNum"
           v-model:page-size="queryParams.pageSize"
-          :page-sizes="[10, 20, 50]"
+          :page-sizes="[12, 24, 48]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total"
           @size-change="handleQuery"
@@ -50,6 +85,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { Picture } from '@element-plus/icons-vue'
 import request from '@/api/request'
 
 const router = useRouter()
@@ -58,14 +94,23 @@ const loading = ref(false)
 const plantList = ref([])
 const total = ref(0)
 
+const getDifficultyType = (difficulty) => {
+  const map = {
+    '简单': 'success',
+    '中等': 'warning',
+    '困难': 'danger'
+  }
+  return map[difficulty] || 'info'
+}
+
 const handleDetail = (row) => {
-    router.push(`/plant/official/${row.id}`)
+  router.push('/plant/official/' + row.id)
 }
 
 const queryParams = reactive({
   keyword: '',
   pageNum: 1,
-  pageSize: 10
+  pageSize: 12
 })
 
 const handleQuery = async () => {
@@ -116,5 +161,83 @@ onMounted(() => {
 .page-subtitle {
   font-size: 13px;
   color: var(--el-text-color-secondary);
+}
+
+.plant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  min-height: 200px;
+}
+
+.plant-card {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.plant-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.plant-card :deep(.el-card__body) {
+  padding: 12px;
+}
+
+.plant-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.plant-image-wrapper {
+  width: 100%;
+  height: 160px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.plant-thumb {
+  width: 100%;
+  height: 100%;
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f0f5f0 0%, #e8f0e8 100%);
+  color: #a0c4a0;
+}
+
+.plant-info {
+  text-align: center;
+  width: 100%;
+}
+
+.plant-name {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+}
+
+.plant-taxonomy {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+
+.empty-state {
+  padding: 40px 0;
+}
+
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

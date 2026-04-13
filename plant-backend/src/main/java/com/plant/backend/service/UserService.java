@@ -87,4 +87,15 @@ public interface UserService extends IService<User> {
      * @param ip 登录 IP
      */
     void updateLastLoginInfo(Long userId, String ip);
+
+    /**
+     * 检查邮箱是否已注册
+     */
+    boolean isEmailRegistered(String email);
+
+    /**
+     * 绑定邮箱
+     */
+    void bindEmail(Long userId, UserDTO.BindEmailRequest request);
+
 }

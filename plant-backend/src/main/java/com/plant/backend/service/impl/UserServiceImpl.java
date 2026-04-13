@@ -8,6 +8,7 @@ import com.plant.backend.entity.User;
 import com.plant.backend.event.UserDeletedEvent;
 import com.plant.backend.exception.BusinessException;
 import com.plant.backend.mapper.UserMapper;
+import com.plant.backend.service.EmailVerificationService;
 import com.plant.backend.service.UserService;
 import com.plant.backend.util.JwtUtil;
 import com.plant.backend.util.ResultCode;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService;
     private final JwtUtil jwtUtil;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -314,4 +316,40 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         info.setCreateTime(user.getCreateTime());
         return info;
     }
+
+    @Override
+    public boolean isEmailRegistered(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getEmail, email.trim().toLowerCase());
+        return baseMapper.selectCount(wrapper) > 0;
+    }
+
+    @Override
+    @Transactional
+    public void bindEmail(Long userId, UserDTO.BindEmailRequest request) {
+        if (!emailVerificationService.consumeCode(request.getEmail(), request.getCode(), "bind")) {
+            throw new BusinessException(ResultCode.PARAM_ERROR.getCode(), "验证码错误或已过期");
+        }
+
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getEmail, request.getEmail().trim().toLowerCase())
+               .ne(User::getUserId, userId);
+        if (baseMapper.selectCount(wrapper) > 0) {
+            throw new BusinessException(ResultCode.PARAM_ERROR.getCode(), "该邮箱已被其他用户绑定");
+        }
+
+        User user = baseMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
+        }
+        user.setEmail(request.getEmail().trim().toLowerCase());
+        user.setUpdateTime(LocalDateTime.now());
+        baseMapper.updateById(user);
+
+        log.info("用户 {} 绑定邮箱: {}", userId, request.getEmail());
+    }
+
 }
