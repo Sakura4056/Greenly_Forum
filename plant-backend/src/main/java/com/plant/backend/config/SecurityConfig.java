@@ -46,6 +46,8 @@ public class SecurityConfig {
                 // 公开访问的接口（无需认证）
                 .requestMatchers(
                     "/api/user/login",
+                    "/api/user/send-reset-code",
+                    "/api/user/reset-password",
                     "/api/user/register",
                     "/api/plant/**",           // 官方植物库
                     // 论坛写操作需要认证

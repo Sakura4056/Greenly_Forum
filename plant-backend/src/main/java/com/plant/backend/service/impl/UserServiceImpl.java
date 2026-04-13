@@ -352,4 +352,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         log.info("用户 {} 绑定邮箱: {}", userId, request.getEmail());
     }
 
+
+    @Override
+    public void sendResetPasswordCode(String email) {
+        log.info("发送重置密码验证码，email: {}", email);
+        emailVerificationService.sendResetPasswordCode(email);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void resetPasswordByEmail(UserDTO.ResetPasswordRequest request) {
+        log.info("重置密码，email: {}", request.getEmail());
+        
+        // 验证验证码
+        if (!emailVerificationService.consumeCode(request.getEmail(), request.getCode(), "reset")) {
+            throw new BusinessException(ResultCode.PARAM_ERROR.getCode(), "验证码错误或已过期");
+        }
+        
+        // 查找绑定该邮箱的用户
+        User user = getOne(new LambdaQueryWrapper<User>()
+                .eq(User::getEmail, request.getEmail().trim().toLowerCase()));
+        if (user == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "该邮箱未绑定任何账号");
+        }
+        
+        // 更新密码
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        updateById(user);
+        
+        log.info("密码重置成功，userId: {}, email: {}", user.getUserId(), request.getEmail());
+    }
+
 }

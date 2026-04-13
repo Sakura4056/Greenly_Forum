@@ -98,4 +98,14 @@ public interface UserService extends IService<User> {
      */
     void bindEmail(Long userId, UserDTO.BindEmailRequest request);
 
+    /**
+     * 发送重置密码验证码
+     */
+    void sendResetPasswordCode(String email);
+
+    /**
+     * 通过邮箱验证码重置密码
+     */
+    void resetPasswordByEmail(UserDTO.ResetPasswordRequest request);
+
 }

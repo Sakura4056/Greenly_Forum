@@ -265,4 +265,40 @@ public class UserDTO {
         @Pattern(regexp = "^\\d{6}$", message = "验证码为 6 位数字")
         private String code;
     }
+
+    /**
+     * 发送重置密码验证码请求 DTO
+     */
+    @Data
+    @Schema(description = "发送重置密码验证码请求")
+    public static class SendResetCodeRequest {
+        
+        @Schema(description = "邮箱地址", example = "zhangsan@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "邮箱不能为空")
+        @Email(message = "邮箱格式不正确")
+        private String email;
+    }
+
+    /**
+     * 重置密码请求 DTO
+     */
+    @Data
+    @Schema(description = "重置密码请求")
+    public static class ResetPasswordRequest {
+        
+        @Schema(description = "邮箱地址", example = "zhangsan@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "邮箱不能为空")
+        @Email(message = "邮箱格式不正确")
+        private String email;
+
+        @Schema(description = "验证码", example = "123456", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "验证码不能为空")
+        @Pattern(regexp = "^\\d{6}$", message = "验证码为 6 位数字")
+        private String code;
+
+        @Schema(description = "新密码", example = "new123456", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "新密码不能为空")
+        @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*()_+-=]{6,16}$", message = "密码需 6-16 位")
+        private String newPassword;
+    }
 }

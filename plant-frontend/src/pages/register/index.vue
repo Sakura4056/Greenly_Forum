@@ -66,7 +66,7 @@
           <el-form-item label="邮箱" prop="email">
             <el-input
               v-model="registerForm.email"
-              placeholder="example@email.com"
+              placeholder="可选，用于找回密码"
               :prefix-icon="Message"
               clearable
               class="modern-input"

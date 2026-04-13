@@ -99,6 +99,24 @@ public class UserController extends BaseController {
         return success();
     }
 
+    // ==================== 重置密码 ====================
+
+    @Operation(summary = "发送重置密码验证码", description = "向已绑定的邮箱发送重置密码验证码（无需登录）")
+    @PostMapping("/send-reset-code")
+    public Result<Void> sendResetCode(@RequestBody @Valid UserDTO.SendResetCodeRequest request) {
+        log.info("发送重置密码验证码，email: {}", request.getEmail());
+        userService.sendResetPasswordCode(request.getEmail());
+        return success();
+    }
+
+    @Operation(summary = "重置密码", description = "通过邮箱验证码重置密码（无需登录）")
+    @PostMapping("/reset-password")
+    public Result<Void> resetPassword(@RequestBody @Valid UserDTO.ResetPasswordRequest request) {
+        log.info("重置密码请求，email: {}", request.getEmail());
+        userService.resetPasswordByEmail(request);
+        return success();
+    }
+
     // ==================== 用户信息 ====================
 
     /**

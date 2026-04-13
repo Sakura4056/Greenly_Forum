@@ -111,3 +111,58 @@ export function getUserDetail(id) {
         method: 'get'
     })
 }
+
+/**
+ * 发送重置密码验证码
+ * @param {Object} data
+ * @param {string} data.email - 邮箱地址
+ */
+export function sendResetCode(data) {
+    return request({
+        url: '/user/send-reset-code',
+        method: 'post',
+        data
+    })
+}
+
+/**
+ * 通过邮箱验证码重置密码
+ * @param {Object} data
+ * @param {string} data.email - 邮箱地址
+ * @param {string} data.code - 验证码
+ * @param {string} data.newPassword - 新密码
+ */
+export function resetPassword(data) {
+    return request({
+        url: '/user/reset-password',
+        method: 'post',
+        data
+    })
+}
+
+/**
+ * 发送邮箱绑定验证码
+ * @param {Object} data
+ * @param {string} data.email - 邮箱地址
+ */
+export function sendBindEmailCode(data) {
+    return request({
+        url: '/user/send-bind-email-code',
+        method: 'post',
+        data
+    })
+}
+
+/**
+ * 绑定邮箱（需验证码）
+ * @param {Object} data
+ * @param {string} data.email - 邮箱地址
+ * @param {string} data.code - 验证码
+ */
+export function bindEmail(data) {
+    return request({
+        url: '/user/bind-email',
+        method: 'post',
+        data
+    })
+}
