@@ -99,13 +99,13 @@ service.interceptors.response.use(
                 }
                 
                 ElMessage({
-                    message: res.message || '请求失败',
+                    message: res.msg || res.message || '请求失败',
                     type: 'error',
                     duration: 3000
                 })
                 
                 // 创建包含完整响应数据的错误对象
-                const error = new Error(res.message || '请求失败')
+                const error = new Error(res.msg || res.message || '请求失败')
                 error.code = res.code
                 error.data = res.data
                 error.response = {
