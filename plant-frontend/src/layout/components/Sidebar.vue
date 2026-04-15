@@ -7,8 +7,11 @@
     :collapse-transition="false"
   >
     <div class="logo-container" :class="{ 'collapsed': collapsed }">
-      <span class="logo-text" v-show="!collapsed">Greenly</span>
-      <span class="logo-text-collapsed" v-show="collapsed">G</span>
+      <div class="logo-inner" v-show="!collapsed">
+        <span class="logo-leaf">🌿</span>
+        <span class="logo-text">Greenly</span>
+      </div>
+      <span class="logo-text-collapsed" v-show="collapsed">🌿</span>
     </div>
     
     <template v-for="route in menuRoutes" :key="route.path">
@@ -56,6 +59,8 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+
+
 
 const props = defineProps({
   collapsed: {
@@ -137,6 +142,18 @@ const resolvePath = (basePath, routePath) => {
     justify-content: center;
   }
   
+  .logo-inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .logo-leaf {
+    font-size: 22px;
+    animation: leaf-sway 3s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+  
   .logo-text {
     font-size: 24px;
     font-weight: 700;
@@ -158,6 +175,11 @@ const resolvePath = (basePath, routePath) => {
     align-items: center;
     justify-content: center;
   }
+}
+
+@keyframes leaf-sway {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
 }
 
 /* Menu Item Styling Override */

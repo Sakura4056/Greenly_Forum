@@ -103,10 +103,10 @@ npm run dev             # 访问 http://localhost:5173
 ```
 Greenly/
 ├── plant-backend/              # Spring Boot 后端
-│   ├── src/main/java/          #   Java 源码 (13 控制器 / 19 服务 / 15 实体)
+│   ├── src/main/java/          #   Java 源码 (13 控制器 / 20 服务 / 16 实体)
 │   └── src/main/resources/     #   配置文件 + SQL 初始化脚本
 ├── plant-frontend/             # Vue 3 前端
-│   ├── src/pages/              #   13 个功能模块页面
+│   ├── src/pages/              #   26 个页面（13 个功能模块）
 │   ├── src/api/                #   API 请求封装
 │   ├── src/stores/             #   Pinia 状态管理
 │   └── src/router/             #   路由配置（模块化）

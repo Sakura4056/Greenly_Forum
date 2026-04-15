@@ -14,8 +14,10 @@ import aiRoutes from './ai.routes'
 import adminRoutes from './admin.routes'
 import diaryRoutes from './diary.routes'
 import forumRoutes from './forum.routes'
+import announcementRoutes from './announcement.routes'
 
 export {
+    announcementRoutes,
     authRoutes,
     dashboardRoutes,
     plantRoutes,

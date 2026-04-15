@@ -49,9 +49,6 @@ public final class CacheKeys {
     /**
      * 验证码相关缓存键
      */
-    public static final String SMS_CODE = "sms:code:";                // sms:code:{phone}
-    public static final String EMAIL_CODE = "email:code:";            // email:code:{email}
-    public static final String IMAGE_CODE = "image:code:";            // image:code:{uuid}
     
     /**
      * 限流相关缓存键

@@ -1,6 +1,6 @@
 # 🗂️ Greenly 项目结构说明
 
-**最后更新**: 2026-04-09
+**最后更新**: 2026-04-15
 
 ---
 
@@ -38,15 +38,15 @@ Greenly/
 ├── base/                # 基础类 (2)
 │   ├── BaseController
 │   └── Result
-├── config/              # 配置类 (8)
+├── config/              # 配置类 (9)
 │   ├── BaiduAiConfig        # 百度 AI
 │   ├── CorsConfig           # CORS 跨域
-│   ├── DotenvConfig         # .env 加载
 │   ├── HttpClientConfig     # HTTP 客户端
 │   ├── MyBatisPlusConfig    # MyBatis Plus
 │   ├── MyMetaObjectHandler  # 自动填充
 │   ├── RedisConfig          # Redis
 │   ├── SecurityConfig       # Spring Security
+│   ├── SwaggerConfig        # Swagger API 文档
 │   └── WebMvcConfig         # Web MVC
 ├── controller/          # REST 控制器 (13)
 │   ├── AiController             # AI 识别
@@ -59,13 +59,14 @@ Greenly/
 │   ├── PlantController          # 官方植物库
 │   ├── PlantDiaryController     # 养护日记
 │   ├── ReminderController       # 提醒
+│   ├── SmartWateringController  # 智能浇水
 │   ├── TestController           # 测试接口
 │   └── UserController           # 用户
 ├── dto/                 # 数据传输对象 (13)
-├── entity/              # 实体类 (15)
-├── mapper/              # MyBatis Mapper (15)
-├── service/             # 服务层 (19)
-│   └── impl/            # 服务实现 (12)
+├── entity/              # 实体类 (16)
+├── mapper/              # MyBatis Mapper (16)
+├── service/             # 服务层 (20)
+│   └── impl/            # 服务实现 (19)
 ├── event/               # 事件
 │   └── UserDeletedEvent
 ├── task/                # 定时任务
@@ -73,7 +74,7 @@ Greenly/
 └── PlantBackendApplication  # 启动类
 ```
 
-### 数据表 (15 张)
+### 数据表 (16 张)
 
 | 分类 | 表名 | 说明 |
 |------|------|------|
@@ -83,7 +84,8 @@ Greenly/
 | **内容** | `plant_photo` / `plant_diary` | 照片 / 日记 |
 | **论坛** | `forum_post` / `forum_comment` / `forum_like` / `forum_category` | 帖子 / 评论 / 点赞 / 分类 |
 | **提醒** | `reminder_config` / `reminder` | 提醒配置 / 消息提醒 |
-| **系统** | `announcement` / `ai_conversation` | 公告 / AI 对话记录 |
+| **AI** | `ai_conversation` / `identify_history` | AI 对话记录 / 识别历史 |
+| **系统** | `announcement` | 公告 |
 
 ---
 
@@ -105,6 +107,7 @@ Greenly/
 | `identification/` | 植物识别 | 图像识别 |
 | `reminder/` | 提醒设置 | 提醒配置 |
 | `user/` | 个人中心 | 资料编辑 |
+| `announcement/` | 公告浏览 | 系统公告列表 |
 | `admin/` | 后台管理 | 用户管理 + 公告 |
 
 ### 技术栈

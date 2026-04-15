@@ -39,10 +39,12 @@ public class PlantDiaryServiceImpl implements PlantDiaryService {
     public Long createDiary(Long userId, PlantDiaryDTO.CreateRequest request) {
         log.info("Create diary for user {}, plant: {}", userId, request.getPlantId());
 
-        // Verify plant ownership
-        MyPlant plant = myPlantMapper.selectById(request.getPlantId());
-        if (plant == null || !userId.equals(plant.getUserId())) {
-            throw new BusinessException("植物不存在或无权限");
+        // Verify plant ownership (only if plantId is provided)
+        if (request.getPlantId() != null) {
+            MyPlant plant = myPlantMapper.selectById(request.getPlantId());
+            if (plant == null || !userId.equals(plant.getUserId())) {
+                throw new BusinessException("植物不存在或无权限");
+            }
         }
 
         PlantDiary diary = new PlantDiary();
@@ -239,10 +241,12 @@ public class PlantDiaryServiceImpl implements PlantDiaryService {
         response.setDiaryDate(diary.getDiaryDate().toString());
         response.setCreateTime(diary.getCreateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
-        // Get plant nickname
-        MyPlant plant = myPlantMapper.selectById(diary.getPlantId());
-        if (plant != null) {
-            response.setPlantNickname(plant.getNickname());
+        // Get plant nickname (only if plantId exists)
+        if (diary.getPlantId() != null) {
+            MyPlant plant = myPlantMapper.selectById(diary.getPlantId());
+            if (plant != null) {
+                response.setPlantNickname(plant.getNickname());
+            }
         }
 
         // Parse photo IDs

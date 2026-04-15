@@ -20,10 +20,13 @@ public class PlantServiceImpl implements PlantService {
         Page<OfficialPlant> page = new Page<>(query.getPageNum(), query.getPageSize());
         LambdaQueryWrapper<OfficialPlant> wrapper = new LambdaQueryWrapper<>();
 
+        if (query.getDifficulty() != null && !query.getDifficulty().isEmpty()) {
+            wrapper.eq(OfficialPlant::getDifficulty, query.getDifficulty());
+        }
         if (query.getKeyword() != null && !query.getKeyword().isEmpty()) {
-            wrapper.like(OfficialPlant::getName, query.getKeyword())
+            wrapper.and(w -> w.like(OfficialPlant::getName, query.getKeyword())
                     .or().like(OfficialPlant::getGenus, query.getKeyword())
-                    .or().like(OfficialPlant::getSpecies, query.getKeyword());
+                    .or().like(OfficialPlant::getSpecies, query.getKeyword()));
         }
 
         return officialPlantMapper.selectPage(page, wrapper);

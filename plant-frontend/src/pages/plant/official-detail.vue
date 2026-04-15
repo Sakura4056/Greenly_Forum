@@ -1,188 +1,122 @@
 <template>
-  <div class="official-plant-detail-container">
-    <!-- 官方植物库详情页 - 查看植物百科信息，可添加到我的植物 -->
-    <el-card v-loading="loading">
-      <template #header>
-        <div class="card-header">
-          <el-page-header @back="$router.back()">
-            <template #content>
-              <span class="page-title">{{ plant.name || '植物详情' }}</span>
-            </template>
-          </el-page-header>
+  <div class="detail-page">
+    <!-- 返回 + 标题 -->
+    <div class="page-top">
+      <el-page-header @back="$router.back()">
+        <template #content>
+          <span class="page-title">{{ plant.name || '植物详情' }}</span>
+        </template>
+      </el-page-header>
+    </div>
+
+    <div v-if="plant && plant.name" class="detail-body" v-loading="loading">
+      <!-- Hero 区域 -->
+      <div class="hero-section">
+        <el-image
+          v-if="plant.imageUrl"
+          :src="plant.imageUrl"
+          :preview-src-list="[plant.imageUrl]"
+          fit="cover"
+          class="hero-img"
+        >
+          <template #error>
+            <div class="hero-placeholder">
+              <span class="hero-emoji">🌱</span>
+              <span class="hero-name">{{ plant.name }}</span>
+            </div>
+          </template>
+        </el-image>
+        <div v-else class="hero-placeholder">
+          <span class="hero-emoji">🌱</span>
+          <span class="hero-name">{{ plant.name }}</span>
         </div>
-      </template>
-
-      <div v-if="plant" class="detail-container">
-        <!-- 顶部大图 -->
-        <div class="plant-image">
-          <el-image
-            v-if="plant.imageUrl"
-            :src="plant.imageUrl"
-            :preview-src-list="[plant.imageUrl]"
-            fit="cover"
-            class="plant-image-main"
-          >
-            <template #error>
-              <div class="image-error">
-                <el-icon><Picture /></el-icon>
-                <span>暂无图片</span>
-              </div>
-            </template>
-          </el-image>
-          <div v-else class="plant-image-placeholder">
-            <el-icon size="60"><PictureFilled /></el-icon>
-            <span>暂无图片</span>
-          </div>
+        <!-- 渐变遮罩 -->
+        <div class="hero-overlay">
+          <h1 class="hero-title">{{ plant.name }}</h1>
+          <p class="hero-subtitle">{{ plant.genus }} · {{ plant.species }}</p>
         </div>
-
-        <!-- 基本信息卡片 -->
-        <el-card class="info-card" shadow="hover">
-          <template #header>
-            <div class="card-title">
-              <el-icon><Collection /></el-icon>
-              <span>基本信息</span>
-            </div>
-          </template>
-          <el-descriptions :column="2" border>
-            <el-descriptions-item label="植物名称">{{ plant.name }}</el-descriptions-item>
-            <el-descriptions-item label="科属">
-              {{ plant.genus }} {{ plant.species }}
-            </el-descriptions-item>
-            <el-descriptions-item label="养护难度">
-              <el-tag :type="getDifficultyType(plant.difficulty)">
-                {{ plant.difficulty || '未知' }}
-              </el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="花期">
-              {{ plant.bloomSeason || '未知' }}
-            </el-descriptions-item>
-            <el-descriptions-item label="光照需求">
-              <el-tag effect="plain">{{ plant.lightReq || '未知' }}</el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="浇水频率">
-              <el-tag effect="plain">{{ plant.waterReq || '未知' }}</el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="适宜温度">
-              {{ plant.tempRange || '未知' }}
-            </el-descriptions-item>
-            <el-descriptions-item label="土壤要求">
-              {{ plant.soilReq || '未知' }}
-            </el-descriptions-item>
-          </el-descriptions>
-        </el-card>
-
-        <!-- 描述 -->
-        <el-card v-if="plant.description" class="info-card" shadow="hover">
-          <template #header>
-            <div class="card-title">
-              <el-icon><Document /></el-icon>
-              <span>植物描述</span>
-            </div>
-          </template>
-          <p class="description-text">{{ plant.description }}</p>
-        </el-card>
-
-        <!-- 养护指南折叠面板 -->
-        <el-card class="info-card" shadow="hover">
-          <template #header>
-            <div class="card-title">
-              <el-icon><Guide /></el-icon>
-              <span>养护指南</span>
-            </div>
-          </template>
-          <el-collapse accordion>
-            <el-collapse-item title="💡 光照需求" name="light">
-              <div class="collapse-content">
-                <el-icon><Sunny /></el-icon>
-                <span>{{ plant.lightReq || '暂无信息' }}</span>
-              </div>
-            </el-collapse-item>
-            <el-collapse-item title="💧 浇水频率" name="water">
-              <div class="collapse-content">
-                <el-icon><Umbrella /></el-icon>
-                <span>{{ plant.waterReq || '暂无信息' }}</span>
-              </div>
-            </el-collapse-item>
-            <el-collapse-item title="🌡️ 适宜温度" name="temp">
-              <div class="collapse-content">
-                <el-icon><Odometer /></el-icon>
-                <span>{{ plant.tempRange || '暂无信息' }}</span>
-              </div>
-            </el-collapse-item>
-            <el-collapse-item title="🌱 土壤要求" name="soil">
-              <div class="collapse-content">
-                <el-icon><Grid /></el-icon>
-                <span>{{ plant.soilReq || '暂无信息' }}</span>
-              </div>
-            </el-collapse-item>
-            <el-collapse-item title="🐛 常见病虫害" name="diseases">
-              <div class="collapse-content">
-                <el-icon><Warning /></el-icon>
-                <span>{{ plant.commonDiseases || '暂无信息' }}</span>
-              </div>
-            </el-collapse-item>
-            <el-collapse-item title="📝 养护小贴士" name="tips">
-              <div class="collapse-content tips-content">
-                {{ plant.careTips || '暂无信息' }}
-              </div>
-            </el-collapse-item>
-          </el-collapse>
-        </el-card>
-
-        <!-- 底部操作栏 -->
-        <div class="bottom-actions">
-          <el-button type="primary" size="large" @click="handleAddToMyPlant">
-            <el-icon><Plus /></el-icon>
-            添加到我的植物
-          </el-button>
+        <!-- 难度徽章 -->
+        <div v-if="plant.difficulty" class="hero-badge" :class="getDifficultyClass(plant.difficulty)">
+          {{ plant.difficulty }}
         </div>
       </div>
-    </el-card>
+
+      <!-- 养护参数卡片组 -->
+      <div class="stat-cards">
+        <div class="stat-card" v-for="item in careStats" :key="item.label">
+          <div class="stat-icon">{{ item.icon }}</div>
+          <div class="stat-info">
+            <div class="stat-label">{{ item.label }}</div>
+            <div class="stat-value">{{ item.value || '未知' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 植物描述 -->
+      <div class="section" v-if="plant.description">
+        <h3 class="section-title">📖 植物简介</h3>
+        <p class="section-text">{{ plant.description }}</p>
+      </div>
+
+      <!-- 土壤要求 -->
+      <div class="section" v-if="plant.soilReq">
+        <h3 class="section-title">🌱 土壤要求</h3>
+        <p class="section-text">{{ plant.soilReq }}</p>
+      </div>
+
+      <!-- 养护小贴士 -->
+      <div class="section tips-section" v-if="plant.careTips">
+        <h3 class="section-title">💡 养护小贴士</h3>
+        <div class="tips-box">
+          <p class="section-text">{{ plant.careTips }}</p>
+        </div>
+      </div>
+
+      <!-- 常见病虫害 -->
+      <div class="section" v-if="plant.commonDiseases">
+        <h3 class="section-title">🐛 常见病虫害</h3>
+        <p class="section-text">{{ plant.commonDiseases }}</p>
+      </div>
+
+      <!-- 底部操作 -->
+      <div class="bottom-bar">
+        <el-button type="primary" size="large" round @click="handleAddToMyPlant">
+          <el-icon><Plus /></el-icon>
+          添加到我的植物
+        </el-button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import {
-  Picture,
-  PictureFilled,
-  Collection,
-  Document,
-  Guide,
-  Sunny,
-  Umbrella,  // 使用雨伞图标代表浇水
-  Odometer,
-  Grid,
-  Warning,
-  Plus
-} from '@element-plus/icons-vue'
+import { Plus } from '@element-plus/icons-vue'
 import request from '@/api/request'
 
 const router = useRouter()
 const route = useRoute()
-
 const loading = ref(false)
 const plant = ref({})
 
-const getDifficultyType = (difficulty) => {
-  if (!difficulty) return 'info'
-  const map = {
-    '简单': 'success',
-    '中等': 'warning',
-    '困难': 'danger'
-  }
-  return map[difficulty] || 'info'
+const careStats = computed(() => [
+  { icon: '☀️', label: '光照需求', value: plant.value.lightReq },
+  { icon: '💧', label: '浇水频率', value: plant.value.waterReq },
+  { icon: '🌡️', label: '适宜温度', value: plant.value.tempRange },
+  { icon: '🌸', label: '花期', value: plant.value.bloomSeason },
+])
+
+const getDifficultyClass = (d) => {
+  return { '简单': 'easy', '中等': 'medium', '困难': 'hard', '较难': 'hard' }[d] || ''
 }
 
 const fetchPlantDetail = async () => {
   loading.value = true
   try {
-    console.log('请求 URL:', `/api/plant/official/${route.params.id}`)
     const res = await request.get(`/plant/official/${route.params.id}`)
-    console.log('植物详情响应:', res)
-    plant.value = res.data || res
+    plant.value = res
   } catch (error) {
     console.error('获取植物详情失败:', error)
     ElMessage.error('获取植物详情失败')
@@ -203,97 +137,189 @@ const handleAddToMyPlant = () => {
   })
 }
 
-onMounted(() => {
-  fetchPlantDetail()
-})
+onMounted(() => { fetchPlantDetail() })
 </script>
 
 <style scoped>
-.official-plant-detail-container {
+.detail-page {
   padding: 20px;
+  max-width: 860px;
+  margin: 0 auto;
 }
 
-.card-header {
-  display: flex;
-  align-items: center;
+.page-top {
+  margin-bottom: 20px;
 }
 
 .page-title {
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 600;
 }
 
-.detail-container {
-  max-width: 900px;
-  margin: 0 auto;
+/* Hero */
+.hero-section {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  height: 360px;
+  margin-bottom: 24px;
 }
 
-.plant-image {
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.plant-image-main {
+.hero-img {
   width: 100%;
-  max-height: 400px;
-  border-radius: 8px;
-}
-
-.plant-image-placeholder {
-  width: 100%;
-  height: 300px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #909399;
-}
-
-.image-error {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   height: 100%;
-  color: #909399;
 }
 
-.info-card {
-  margin-bottom: 20px;
+.hero-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
 }
 
-.card-title {
+.hero-emoji {
+  font-size: 80px;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));
+}
+
+.hero-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.hero-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 40px 28px 24px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.65));
+  color: #fff;
+}
+
+.hero-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.hero-subtitle {
+  font-size: 15px;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.hero-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  backdrop-filter: blur(6px);
+}
+
+.hero-badge.easy { background: rgba(103,194,58,0.9); }
+.hero-badge.medium { background: rgba(230,162,60,0.9); }
+.hero-badge.hard { background: rgba(245,108,108,0.9); }
+
+/* 养护参数卡片 */
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 16px;
-  font-weight: bold;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--el-bg-color, #fff);
+  border: 1px solid var(--el-border-color-lighter, #ebeef5);
+  border-radius: 12px;
+  transition: all 0.2s;
 }
 
-.description-text {
-  line-height: 1.8;
-  color: #606266;
-  white-space: pre-wrap;
+.stat-card:hover {
+  border-color: var(--el-color-primary-light-5, #a0cfff);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 
-.collapse-content {
+.stat-icon {
+  font-size: 28px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 0;
+  justify-content: center;
+  background: #f5f7fa;
+  border-radius: 10px;
+  flex-shrink: 0;
 }
 
-.tips-content {
-  display: block;
-  line-height: 1.8;
-  color: #606266;
+.stat-label {
+  font-size: 12px;
+  color: var(--el-text-color-secondary, #909399);
+  margin-bottom: 2px;
 }
 
-.bottom-actions {
+.stat-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--el-text-color-primary, #303133);
+}
+
+/* 内容区块 */
+.section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--el-text-color-primary, #303133);
+}
+
+.section-text {
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--el-text-color-regular, #606266);
+  margin: 0;
+}
+
+.tips-section .tips-box {
+  background: linear-gradient(135deg, #fff8e1, #fff3e0);
+  border-left: 4px solid #ff9800;
+  padding: 16px 20px;
+  border-radius: 0 12px 12px 0;
+}
+
+/* 底部操作 */
+.bottom-bar {
   text-align: center;
-  padding-top: 20px;
-  border-top: 1px solid #ebeef5;
+  padding: 28px 0 12px;
+  border-top: 1px solid var(--el-border-color-lighter, #ebeef5);
+}
+
+/* 移动端 */
+@media (max-width: 768px) {
+  .detail-page { padding: 12px; }
+  .hero-section { height: 260px; }
+  .hero-title { font-size: 22px; }
+  .hero-emoji { font-size: 56px; }
+  .stat-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stat-card { padding: 12px; gap: 10px; }
+  .stat-icon { font-size: 22px; width: 36px; height: 36px; }
 }
 </style>

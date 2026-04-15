@@ -1,9 +1,10 @@
 <template>
   <section 
     class="stat-card card-hover"
-    :class="variantClass"
+    :class="[variantClass, { clickable: to }]"
     role="region"
     :aria-label="`${label}统计`"
+    @click="handleClick"
   >
     <div class="stat-icon" :class="iconBgClass">
       <el-icon :size="28" :color="iconColor">
@@ -20,6 +21,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   value: {
@@ -42,8 +44,20 @@ const props = defineProps({
   icon: {
     type: Object,
     default: null
+  },
+  to: {
+    type: String,
+    default: ''
   }
 })
+
+const router = useRouter()
+
+const handleClick = () => {
+  if (props.to) {
+    router.push(props.to)
+  }
+}
 
 const variantClass = computed(() => `stat-card--${props.variant}`)
 
@@ -82,14 +96,44 @@ const displayValue = computed(() => {
 
 .stat-card {
   background: var(--color-surface);
-  border-radius: var(--border-radius-base);
+  border-radius: 16px;
   padding: var(--spacing-xl);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 80px;
+    border-radius: 0 16px 0 80px;
+    opacity: 0.06;
+    transition: opacity 0.3s;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+    &::after { opacity: 0.1; }
+  }
+
+  &--success::after { background: #52c41a; }
+  &--warning::after { background: #faad14; }
+  &--danger::after { background: #ff4d4f; }
+  &--primary::after { background: #1890ff; }
+  &--info::after { background: #722ed1; }
   display: flex;
   align-items: center;
   gap: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-normal);
-  cursor: default;
+  &.clickable {
+    cursor: pointer;
+  }
   
   &:hover {
     transform: translateY(-4px);
@@ -97,9 +141,10 @@ const displayValue = computed(() => {
   }
   
   .stat-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: var(--border-radius-full);
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;

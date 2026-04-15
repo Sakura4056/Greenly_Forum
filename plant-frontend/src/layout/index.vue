@@ -39,8 +39,6 @@
             <h2 class="page-title" aria-level="1">植物养护管理系统</h2>
           </div>
           <div class="header-right">
-            <!-- 智能浇水提醒 -->
-            
             <!-- 用户菜单 -->
             <div 
               class="user-profile" 
@@ -104,7 +102,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import Sidebar from './components/Sidebar.vue'
-
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import { ArrowDown, User, SwitchButton } from '@element-plus/icons-vue'
@@ -140,6 +137,7 @@ const checkMobile = () => {
     showMobileSidebar.value = false
   }
 }
+
 onMounted(() => {
   checkMobile()
   window.addEventListener('resize', checkMobile)
@@ -262,7 +260,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  
+
   /* 用户菜单 */
   .user-profile {
     display: flex;

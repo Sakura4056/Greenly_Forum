@@ -8,6 +8,7 @@ public class PlantDTO {
     public static class OfficialQuery {
         private String keyword;
         private String category;
+        private String difficulty;
         private Integer pageNum = 1;
         private Integer pageSize = 10;
     }

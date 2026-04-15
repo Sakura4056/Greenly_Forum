@@ -66,13 +66,9 @@ service.interceptors.response.use(
     response => {
         const res = response.data
         
-        console.log('=== 响应拦截器 ===')
-        console.log('完整响应:', response)
-        console.log('response.data:', res)
         
         // 处理后端响应的标准 Result 结构
         if (res.code !== undefined) {
-            console.log('检测到标准响应格式，code:', res.code)
             
             if (res.code !== 200) {
                 // Token 过期处理
@@ -114,7 +110,6 @@ service.interceptors.response.use(
                 }
                 return Promise.reject(error)
             }
-            console.log('返回 res.data:', res.data)
             return res.data
         }
         

@@ -1,5 +1,9 @@
 <template>
   <div class="login-container">
+    <!-- Floating Particles -->
+    <div class="particles" aria-hidden="true">
+      <div v-for="n in 20" :key="n" class="particle" :style="particleStyle(n)" />
+    </div>
     <div class="login-content">
       <el-card class="login-card glass-panel">
         <template #header>
@@ -229,6 +233,16 @@ const handleLogin = async () => {
 /**
  * 快速登录（测试用）
  */
+const particleStyle = (n) => ({
+  left: `${(n * 5.3) % 100}%`,
+  top: `${(n * 7.1 + 10) % 100}%`,
+  width: `${6 + (n % 4) * 4}px`,
+  height: `${6 + (n % 4) * 4}px`,
+  animationDelay: `${n * 0.5}s`,
+  animationDuration: `${15 + (n % 5) * 3}s`,
+  opacity: 0.15 + (n % 3) * 0.1
+})
+
 const quickLogin = (username, password) => {
   loginForm.username = username
   loginForm.password = password
@@ -409,6 +423,40 @@ const quickLogin = (username, password) => {
   
   .el-button {
     flex: 1;
+  }
+}
+
+/* Floating Particles */
+.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  animation: float-particle linear infinite;
+}
+
+@keyframes float-particle {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-30px) translateX(15px) rotate(90deg);
+  }
+  50% {
+    transform: translateY(-10px) translateX(-10px) rotate(180deg);
+  }
+  75% {
+    transform: translateY(-40px) translateX(20px) rotate(270deg);
   }
 }
 

@@ -46,6 +46,7 @@
             :value="stats.plantCount || 0"
             label="我的植物"
             variant="success"
+            to="/plant/my-list"
           >
             <template #icon><Pear /></template>
           </StatCard>
@@ -55,6 +56,7 @@
             :value="stats.pendingTaskCount || 0"
             label="待办任务"
             variant="warning"
+            to="/care/schedule-list"
           >
             <template #icon><List /></template>
           </StatCard>
@@ -64,6 +66,7 @@
             :value="stats.todayReminderCount || 0"
             label="今日提醒"
             variant="danger"
+            to="/reminder/unread"
           >
             <template #icon><Bell /></template>
           </StatCard>
@@ -170,7 +173,7 @@
  * 展示用户概览数据、天气信息和快捷操作
  */
 import { ref, onMounted, reactive, nextTick, watch, computed, onUnmounted } from 'vue'
-import { getOfficialPlantList } from '@/api/plant'
+import { getMyPlantList } from '@/api/my-plant'
 import { getScheduleList } from '@/api/care'
 import { getUnread, markRead as markReadAPI } from '@/api/reminder'
 import {
@@ -306,6 +309,18 @@ const quickActions = [
     label: '查看统计',
     icon: DataLine,
     iconClass: 'bg-warning-gradient'
+  },
+  {
+    path: '/diary/list',
+    label: '写日记',
+    icon: ChatDotRound,
+    iconClass: 'bg-danger-gradient'
+  },
+  {
+    path: '/plant/my-list',
+    label: '我的植物',
+    icon: Pear,
+    iconClass: 'bg-teal-gradient'
   }
 ]
 
@@ -355,7 +370,7 @@ const fetchDashboardData = async () => {
   isLoading.value = true
   try {
     const [plantRes, scheduleRes, reminderRes] = await Promise.all([
-      getOfficialPlantList({ pageNum: 1, pageSize: 1000 }),
+      getMyPlantList({ pageNum: 1, pageSize: 1000 }),
       getScheduleList({ userId: userStore.userId, status: 0, pageSize: 4 }),
       getUnread(userStore.userId)
     ])
@@ -693,27 +708,53 @@ onUnmounted(() => {
 .stats-section {
   .stat-card {
     background: var(--color-surface);
-    border-radius: var(--border-radius-base);
+    border-radius: 16px;
     padding: var(--spacing-xl);
     display: flex;
     align-items: center;
     gap: var(--spacing-lg);
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-normal);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
     cursor: default;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 80px;
+      height: 80px;
+      border-radius: 0 16px 0 80px;
+      opacity: 0.06;
+      transition: opacity 0.3s;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      &::after { opacity: 0.1; }
+    }
+
+    &:nth-child(1)::after { background: #52c41a; }
+    &:nth-child(2)::after { background: #faad14; }
+    &:nth-child(3)::after { background: #ff4d4f; }
 
     .stat-icon {
-      width: 60px;
-      height: 60px;
-      border-radius: var(--border-radius-full);
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
+      font-size: 24px;
+      flex-shrink: 0;
 
-      &.bg-success-light { background-color: rgba(46, 204, 113, 0.1); }
-      &.bg-warning-light { background-color: rgba(243, 156, 18, 0.1); }
-      &.bg-danger-light { background-color: rgba(231, 76, 60, 0.1); }
+      &.bg-success-light { background: linear-gradient(135deg, rgba(82, 196, 26, 0.12), rgba(82, 196, 26, 0.04)); color: #52c41a; }
+      &.bg-warning-light { background: linear-gradient(135deg, rgba(250, 173, 20, 0.12), rgba(250, 173, 20, 0.04)); color: #faad14; }
+      &.bg-danger-light { background: linear-gradient(135deg, rgba(255, 77, 79, 0.12), rgba(255, 77, 79, 0.04)); color: #ff4d4f; }
     }
 
     .stat-info {
@@ -721,14 +762,15 @@ onUnmounted(() => {
       flex-direction: column;
 
       .stat-value {
-        font-size: 32px;
+        font-size: 28px;
         font-weight: 700;
         color: var(--color-text-main);
         line-height: 1.2;
+        font-variant-numeric: tabular-nums;
       }
 
       .stat-label {
-        font-size: 14px;
+        font-size: 13px;
         color: var(--color-text-secondary);
         margin-top: 4px;
       }
@@ -803,6 +845,8 @@ onUnmounted(() => {
       &.bg-success-gradient { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); }
       &.bg-info-gradient { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); }
       &.bg-warning-gradient { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); }
+      &.bg-danger-gradient { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+      &.bg-teal-gradient { background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%); }
     }
 
     span {
